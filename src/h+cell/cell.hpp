@@ -3,6 +3,8 @@
 
 #include "yocto/lua/lua-state.hpp"
 #include "yocto/lua/lua-config.hpp"
+#include "yocto/lua/lua-maths.hpp"
+
 #include "yocto/chemical/lua/io.hpp"
 #include "yocto/math/ode/explicit/driver-ck.hpp"
 #include "yocto/ptr/auto.hpp"
@@ -11,6 +13,7 @@ using namespace yocto;
 using namespace math;
 
 typedef auto_ptr<chemical::solution> solution_ptr;
+typedef Lua::Function<double>        SP_Function;  //!< surface permeability
 
 class Cell
 {
@@ -31,6 +34,8 @@ public:
     
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
+    chemical::species_ctor species_ctor_cb;
+    void                   species_ctor_fn(lua_State *L,chemical::species &sp);
 };
 
 

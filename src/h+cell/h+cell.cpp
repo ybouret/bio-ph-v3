@@ -12,6 +12,8 @@ int main(int argc, char *argv[])
         
         Lua::State VM;
         lua_State *L = VM();
+        Lua::Config::DoFile(L, argv[1]);
+        
         Cell cell(L);
         return 0;
     }
