@@ -50,9 +50,10 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
         throw exception("no species");
     std::cerr << lib << std::endl;
     
-    // create solution
+    // create solutions
     sol_ins.reset( new chemical::solution(lib) );
     sol_out.reset( new chemical::solution(lib) );
+    sol_tmp.reset( new chemical::solution(lib) );
     
     //__________________________________________________________________________
     //

@@ -24,13 +24,13 @@ int main(int argc, char *argv[])
         Cell    cell(cfgfile);
         
         
-        
-        
         chemical::solution leak(cell.lib);
         
         cell.leak(leak, 0.0, 0.0,  * cell.sol_ins, * cell.sol_out );
         
         std::cerr << "leak=" << leak << std::endl;
+        
+        cell.compute_Em();
         
         
         return 0;

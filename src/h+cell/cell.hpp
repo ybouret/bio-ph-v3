@@ -43,7 +43,7 @@ public:
     auto_ptr<chemical::solution> sol_out; //!< one solution outside
     vector<chemical::solution>   out_mix; //!< result from mixing
     vector<double>               weights; //!< storing from lua function 'weights'
-    
+    auto_ptr<chemical::solution> sol_tmp; //!< store temporary
     
     explicit Cell(const string &filename);
     virtual ~Cell() throw();
@@ -54,12 +54,15 @@ public:
     //! collect the passive leaks
     void leak( chemical::solution &lambda, double t, double zeta, const chemical::solution &S, const chemical::solution &S_out);
     
+    //! collect Em@t=0
+    double compute_Em();
     
     
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
     chemical::species_ctor species_ctor_cb;
     void                   species_ctor_fn(lua_State *L,chemical::species &sp);
+    double BiasedPassiveFlux(double zeta);
 };
 
 
