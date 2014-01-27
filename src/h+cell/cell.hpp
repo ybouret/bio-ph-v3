@@ -15,8 +15,8 @@ typedef Lua::Function<double>        SP_Function;  //!< surface permeability
 class Permeability
 {
 public:
-    SP_Function SP;     //!<
-    double      factor; //!< default is 1
+    mutable SP_Function SP;     //!<
+    double              factor; //!< default is 1
     
     Permeability(lua_State *L, const string &fn);
     ~Permeability() throw();
@@ -42,7 +42,7 @@ public:
     auto_ptr<chemical::solution> sol_ins; //!< one solution inside
     auto_ptr<chemical::solution> sol_out; //!< one solution outside
     vector<chemical::solution>   out_mix; //!< result from mixing
-    vector<double>               weights; //!< storing from lua function weights
+    vector<double>               weights; //!< storing from lua function 'weights'
     
     
     explicit Cell(const string &filename);

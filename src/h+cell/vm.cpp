@@ -10,10 +10,13 @@ const double __Faraday__ = 96485.3415;
 
 double Psi( double U ) throw()
 {
-	static const double c[4] = { 1.0, 0.5, 1.0/12, 1.0/720 };
+	static const double c[] = { 1.0, 0.5, 1.0/12, 1.0/720, 1.0/30240};
 	if( Fabs(U) < 1e-3 )
 	{
-		return c[0] - c[1] * U + c[2] * U*U + c[3] * U*U*U;
+        const double U2 = U*U;
+        const double U4 = U2*U2;
+        const double U6 = U4*U2;
+		return c[0] - c[1] * U + c[2] * U2 - c[3] * U4  + c[4] * U6;
 	}
 	else
 	{
