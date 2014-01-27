@@ -12,7 +12,6 @@
 using namespace yocto;
 using namespace math;
 
-typedef auto_ptr<chemical::solution> solution_ptr;
 typedef Lua::Function<double>        SP_Function;  //!< surface permeability
 
 class Cell
@@ -22,11 +21,12 @@ public:
     const size_t          nsp;     //!< #species
     chemical::equilibria  eqs;     //!< equilibria
     
-    chemical::initializer init_ins; //!< inside initializer
-    chemical::initializer init_out; //!< outside initializer
+    chemical::boot::loader init_ins; //!< inside initializer
+    chemical::boot::loader init_out; //!< outside initializer
     
-    solution_ptr          sol_ins; //!< inside solution
-    solution_ptr          sol_out; //!< inside solution
+    auto_ptr<chemical::solution> sol_ins; //!< one solution inside
+    auto_ptr<chemical::solution> sol_out; //!< one solution outside
+    vector<chemical::solution>   out_mix; //!< result from mixing
     
     explicit Cell( lua_State *L );
     virtual ~Cell() throw();

@@ -11,14 +11,13 @@ Cell:: Cell( lua_State *L ) :
 lib(),
 nsp(0),
 eqs(),
+init_ins(),
 species_ctor_cb(this, & Cell::species_ctor_fn)
 {
     const string code = "function SP_ZERO(t,zeta) return 0; end";
-    const string SP_Z = "SP_ZERO";
-
+    
     Lua::Config::DoString(L, code);
-    const SP_Function SP_ZERO(L,SP_Z,true);
-
+    
     //__________________________________________________________________________
     //
     // Loading Species
@@ -31,17 +30,8 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
         throw exception("no species");
     std::cerr << lib << std::endl;
     
-    // complete data
-    for( chemical::collection::iterator i=lib.begin();i!=lib.end();++i)
-    {
-        chemical::species &sp = **i;
-        if( !sp.data.is_active() )
-        {
-            std::cerr << "-- Setting Zero Permeability for " << sp.name << std::endl;
-            sp.data.build<SP_Function,SP_Function>( SP_ZERO );
-        }
-    }
-    
+    // create solution
+    sol_ins.reset( new chemical::solution(lib) );
     
     //__________________________________________________________________________
     //
@@ -50,20 +40,46 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     chemical::_lua::load(L, lib, eqs, "equilibria");
     eqs.build_from(lib);
     
+    //__________________________________________________________________________
+    //
+    // Loading intializers
+    //__________________________________________________________________________
+    chemical::_lua::load(L, init_ins, "inside", lib);
+    
+    init_ins(eqs,lib, 0.0 );
+    sol_ins->load( eqs.C );
+    
+    std::cerr << "S=" << *sol_ins << std::endl;
+    std::cerr << "pH=" << sol_ins->pH() << std::endl;
     
 }
 
 void Cell:: species_ctor_fn(lua_State *L, chemical::species &sp )
 {
+    const string SP_Z = "SP_ZERO";
+    const SP_Function SP_ZERO(L,SP_Z,true);
+
     std::cerr << "-- Parsing Surface Permeability for " << sp.name << std::endl;
     
-    if( !lua_isstring(L, -1) )
-        throw exception("Permeability for '%s' is not a function name", sp.name.c_str());
+    if( lua_isstring(L,-1))
+    {
+        const string fn = lua_tostring(L, -1);
+        std::cerr << "--\t" << fn << std::endl;
+        SP_Function SP(L,fn,true);
+        std::cerr << "--\t\t" << fn << "(0,0.1)=" << SP(0,0.1) << std::endl;
+        
+        sp.data.make<SP_Function>( SP );
+        return;
+    }
     
-    const string fn = lua_tostring(L, -1);
-    std::cerr << "--\t" << fn << std::endl;
-    SP_Function SP(L,fn,true);
-    std::cerr << "--\t\t" << fn << "(0,0.1)=" << SP(0,0.1) << std::endl;
+    if( lua_isnil(L, -1) )
+    {
+        std::cerr << "-- setting to zero" << std::endl;
+        sp.data.make<SP_Function>( SP_ZERO );
+        return;
+    }
     
-    sp.data.build<SP_Function,SP_Function>( SP );
+    throw exception("Permeability for '%s' is not a string/nil", sp.name.c_str());
+    
 }
+
