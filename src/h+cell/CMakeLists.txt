@@ -1,5 +1,6 @@
 
-ADD_LIBRARY(hcell cell.hpp cell.cpp
+ADD_LIBRARY(hcell cell.hpp cell.cpp cell-leak.cpp
+	vm.hpp	vm.cpp
 	../../sample.lua
 )
 

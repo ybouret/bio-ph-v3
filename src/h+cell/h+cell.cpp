@@ -10,11 +10,9 @@ int main(int argc, char *argv[])
         if(argc<=1)
             throw exception("usage: %s config.lua ...", progname);
         
-        Lua::State VM;
-        lua_State *L = VM();
-        Lua::Config::DoFile(L, argv[1]);
+        const string cfgfile = argv[1];
+        Cell    cell(cfgfile);
         
-        Cell cell(L);
         return 0;
     }
     catch(const exception &e)
