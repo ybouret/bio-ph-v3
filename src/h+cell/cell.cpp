@@ -33,9 +33,9 @@ __CELL(volume),
 Em(0),
 init_ins(),
 dt_ini(1e-4),
+ctrl(dt_ini),
 odeint(1e-7),
 X(),
-ctrl(dt_ini),
 drvs(this, & Cell::compute_fields),
 species_ctor_cb(this, & Cell::species_ctor_fn)
 {
@@ -181,7 +181,7 @@ void Cell:: compute_out(double t)
         lua_pop(L,1);
     }
     
-    std::cerr << "weights=" << weights << std::endl;
+    //std::cerr << "weights=" << weights << std::endl;
     sol_out->mix(eqs,out_mix, weights, t);
     
 }
@@ -215,3 +215,17 @@ void Cell:: species_ctor_fn(lua_State *L, chemical::species &sp )
     
 }
 
+
+void Cell:: save_header( ios::ostream &fp ) const
+{
+    fp("#t Em pH "); sol_ins->write_header(fp); fp("\n");
+}
+
+void Cell:: save_values( double t, ios::ostream &fp ) const
+{
+    fp("%e",t);
+    fp(" %e", Em);
+    fp(" %e", sol_ins->pH() );
+    sol_ins->write_values(fp);
+    fp("\n");
+}

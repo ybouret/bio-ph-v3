@@ -85,14 +85,17 @@ public:
     //! ode API
     void compute_fields( array<double> &dYdt, double t, const array<double> &Y );
     
-    const double dt_ini; //!< a small initial value
-    
+    double dt_ini; //!< a small initial value
+    double ctrl;   //!< adaptive control
+
     void step( double t1, double t2);
+    
+    void save_header( ios::ostream &fp ) const;
+    void save_values( double t, ios::ostream &fp ) const;
     
 private:
     ode::driverCK<double>::type  odeint;
     vector<double>               X;
-    double                       ctrl;
     ode::Field<double>::Equation drvs;
     
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);

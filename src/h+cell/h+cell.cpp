@@ -23,13 +23,6 @@ int main(int argc, char *argv[])
         const string cfgfile = argv[1];
         Cell    cell(cfgfile);
         
-        
-        chemical::solution leak(cell.lib);
-        
-        cell.leak(leak, 0.0, 0.0,  * cell.sol_ins, * cell.sol_out );
-        
-        std::cerr << "leak=" << leak << std::endl;
-        
         cell.compute_Em();
         std::cerr << "Em=" << cell.Em*1000 << std::endl;
         
@@ -38,14 +31,21 @@ int main(int argc, char *argv[])
         
         
         cell.adjust_effectors();
+        double        t  = 0;
+        const double  dt = 1;
+        ios::ocstream fp("toto.dat",false);
         
-        double t=0;
-        const double dt = 0.1;
-        while(t<1)
+        cell.initialize(t);
+        
+        cell.save_header(fp);
+        cell.save_values(t, fp);
+        while(t<1000)
         {
             const double t1 = t+dt;
             cell.step(t,t1);
+            std::cerr << "ctrl=" << cell.ctrl << std::endl;
             t=t1;
+            cell.save_values(t,fp);
         }
         
         
