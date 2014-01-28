@@ -35,7 +35,7 @@ public:
     
     const double          surface; //!< cell surface
     const double          volume;  //!< cell volume
-    
+    double                Em;      //!< current potential
     
     chemical::boot::loader init_ins; //!< inside initializer
     
@@ -48,14 +48,20 @@ public:
     explicit Cell(const string &filename);
     virtual ~Cell() throw();
     
-    void compute_out( double t ); //! mix according to weights
+    //! compute the new out solution from the mix, according to the weights
+    void compute_out( double t );
+    
+    //! compute inside and outside composition
     void initialize(double t);
     
     //! collect the passive leaks
     void leak( chemical::solution &lambda, double t, double zeta, const chemical::solution &S, const chemical::solution &S_out);
     
-    //! collect Em@t=0
-    double compute_Em();
+    //! collect Em@t=0 from the current permeabilities
+    void compute_Em();
+
+    //! adjust permeabilities to match Em
+    void adjust_Em();
     
     
 private:
@@ -63,6 +69,9 @@ private:
     chemical::species_ctor species_ctor_cb;
     void                   species_ctor_fn(lua_State *L,chemical::species &sp);
     double BiasedPassiveFlux(double zeta);
+    double ScaledPassiveFlux(double alpha);
+    void   AdjustPermeabilities(double alpha);
+    
 };
 
 

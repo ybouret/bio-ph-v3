@@ -28,13 +28,16 @@ nsp(0),
 eqs(),
 __CELL(surface),
 __CELL(volume),
+Em(0),
 init_ins(),
 species_ctor_cb(this, & Cell::species_ctor_fn)
 {
     const string code = "function SP_ZERO(t,zeta) return 0; end";
     Lua::Config::DoString(L, code);
     
+    draw_line();
     std::cerr << "-- Cell Description" << std::endl;
+    draw_line();
     std::cerr << "\tsurface=" << surface << " mu^2" << std::endl;
     std::cerr << "\tvolume =" << volume  << " mu^3" << std::endl;
     
@@ -80,7 +83,7 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     
     const unsigned nout = lua_rawlen(L,-1);
     if(nout<=0)
-        throw exception("need at list one name in 'outside'");
+        throw exception("need at least one name in 'outside'");
     
     vector<string> init_names;
     for(unsigned i=1;i<=nout;++i)
@@ -109,7 +112,9 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     
     weights.make(nout,0);
     
+    draw_line();
     std::cerr << "-- Initializing..." << std::endl;
+    draw_line();
     initialize(0.0);
     
 }

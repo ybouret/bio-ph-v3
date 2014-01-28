@@ -58,13 +58,24 @@ static inline int SurfaceAndVolume( lua_State *L )
 
 VM:: VM( const string &filename) :
 Lua::State(),
-L(0)
+L(0),
+line_length(63)
 {
-   
+    draw_line();
     std::cerr << "-- Registering Virtual Machine" << std::endl;
+    draw_line();
     Lua::State &vm = *this;
     L = vm();
     lua_register(L, "SurfaceAndVolume", SurfaceAndVolume );
+    draw_line();
     std::cerr << "-- Loading Resources from '" << filename << "'" << std::endl;
     Lua::Config::DoFile(L, filename);
+    draw_line();
 }
+
+void VM:: draw_line() const
+{
+    for(size_t i=line_length;i>0;--i) std::cerr << "-";
+    std::cerr << std::endl;
+}
+

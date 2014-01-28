@@ -31,6 +31,10 @@ int main(int argc, char *argv[])
         std::cerr << "leak=" << leak << std::endl;
         
         cell.compute_Em();
+        std::cerr << "Em=" << cell.Em*1000 << std::endl;
+        
+        cell.Em = -60e-3;
+        cell.adjust_Em();
         
         
         return 0;

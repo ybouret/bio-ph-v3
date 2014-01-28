@@ -13,6 +13,7 @@ extern const double __Faraday__;
 extern const double __R__;
 double Psi(double ) throw();
 
+//! lua irtual machine for internal computations
 class VM : public Lua::State
 {
 public:
@@ -21,6 +22,8 @@ public:
     
     lua_State *L;
     
+    size_t line_length;
+    void   draw_line() const;
     
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(VM);
