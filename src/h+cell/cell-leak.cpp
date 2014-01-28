@@ -20,7 +20,7 @@ void Cell:: leak( chemical::solution &lambda, double t, double zeta, const chemi
         const double             ampl  = perm.SP(t,zeta) * perm.factor;
         const double             X     = (*i).concentration;
         const double             X_out = (*i_out).concentration;
-        const double             J     = - ampl * Psi(zz) * (X_out - X*exp(zz));
+        const double             J     =  ampl * Psi(zz) * (X_out - X*exp(zz));
         cc.concentration = J/volume;
     }
     
