@@ -9,7 +9,6 @@ void Cell:: compute_rates(double t, double zeta)
     
     leak(rates, t, zeta, S, S_out);
     append(rates, t, zeta, S, S_out);
-    
 }
 
 

@@ -21,10 +21,16 @@ int main(int argc, char *argv[])
             throw exception("usage: %s config.lua ...", progname);
         
         const string cfgfile = argv[1];
+        
+        
+        
         Cell    cell(cfgfile);
         
         cell.compute_Em();
         std::cerr << "Em=" << cell.Em*1000 << std::endl;
+        cell.leak( *cell.sol_tmp, 0.0, (cell.Em*__Faraday__)/(__R__*Temperature), * cell.sol_ins, * cell.sol_out);
+        std::cerr << "lambda0=" << *cell.sol_tmp << std::endl;
+
         
         cell.Em = -60e-3;
         cell.adjust_Em();
@@ -36,6 +42,9 @@ int main(int argc, char *argv[])
         ios::ocstream fp("toto.dat",false);
         
         cell.initialize(t);
+        cell.leak( *cell.sol_tmp, t, (cell.Em*__Faraday__)/(__R__*Temperature), * cell.sol_ins, * cell.sol_out);
+        std::cerr << "lambda1=" << *cell.sol_tmp << std::endl;
+        
         
         cell.save_header(fp);
         cell.save_values(t, fp);
@@ -43,7 +52,7 @@ int main(int argc, char *argv[])
         {
             const double t1 = t+dt;
             cell.step(t,t1);
-            std::cerr << "ctrl=" << cell.ctrl << std::endl;
+            //std::cerr << "ctrl=" << cell.ctrl << std::endl;
             t=t1;
             cell.save_values(t,fp);
         }

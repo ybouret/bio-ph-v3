@@ -27,6 +27,8 @@ void Cell:: adjust_effectors()
         NaK.factor = -lam_K/(rate_K);
         std::cerr << "\tNaK.factor=" << NaK.factor << std::endl;
     }
+    
+    
 }
 
 void Cell:: append( chemical::solution &rates, double t, double zeta, const chemical::solution &S, const chemical::solution &S_out)
