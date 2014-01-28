@@ -45,7 +45,7 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     //
     // Loading Species
     //__________________________________________________________________________
-    
+    std::cerr << "-- \tReading Species" << std::endl;
     // parse data
     chemical::_lua::load(L, lib, "species", &species_ctor_cb);
     (size_t &)nsp = lib.size();
@@ -62,6 +62,7 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     //
     // Loading equilibria
     //__________________________________________________________________________
+    std::cerr << "-- \tReading Equilibria" << std::endl;
     chemical::_lua::load(L, lib, eqs, "equilibria");
     eqs.build_from(lib);
     
@@ -69,14 +70,22 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     //
     // Loading inside initializer
     //__________________________________________________________________________
+    std::cerr << "-- \tReading Inside Initializer" << std::endl;
     chemical::_lua::load(L, init_ins, "inside", lib);
     
     
     //__________________________________________________________________________
     //
+    // Loading effectors
+    //__________________________________________________________________________
+    std::cerr << "-- \tReading Effectors" << std::endl;
+    chemical::_lua::load(L, eff, "effectors");
+    
+    //__________________________________________________________________________
+    //
     // Loading outside initializer/solution
     //__________________________________________________________________________
-    std::cerr << "-- Reading Outside Compositions" << std::endl;
+    std::cerr << "-- \tReading Outside Compositions" << std::endl;
     lua_getglobal(L, "outside" );
     if( !lua_istable(L,-1) )
         throw exception("'outside' must be a table");
@@ -113,7 +122,7 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     weights.make(nout,0);
     
     draw_line();
-    std::cerr << "-- Initializing..." << std::endl;
+    std::cerr << "-- Initializing Media" << std::endl;
     draw_line();
     initialize(0.0);
     

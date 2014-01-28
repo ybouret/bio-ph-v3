@@ -36,9 +36,9 @@ public:
     const double          surface; //!< cell surface
     const double          volume;  //!< cell volume
     double                Em;      //!< current potential
+    chemical::effectors   eff;     //!< effectors: required: NaK
     
-    chemical::boot::loader init_ins; //!< inside initializer
-    
+    chemical::boot::loader       init_ins; //!< inside initializer
     auto_ptr<chemical::solution> sol_ins; //!< one solution inside
     auto_ptr<chemical::solution> sol_out; //!< one solution outside
     vector<chemical::solution>   out_mix; //!< result from mixing

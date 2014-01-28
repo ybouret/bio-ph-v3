@@ -96,3 +96,22 @@ function weights(t)
 return 1,0;
 end
 
+-- -----------------------------------------------------------------------------
+-- Effectors
+-- -----------------------------------------------------------------------------
+effectors = {
+    "NaK"
+};
+
+
+-- one function for effector
+K_NaK = 12e-3;
+function NaK(t,zeta,S,S_out)
+local Na = S["Na+"];
+local rho = 0.5*( 1+ math.tanh(0.39*zeta+1.28)) * (Na/(K_NaK+Na));
+ans = {};
+ans["K+"]  =  rho/2.0;
+ans["Na+"] = -rho/3.0;
+return ans;
+end
+

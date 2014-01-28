@@ -13,7 +13,7 @@ extern const double __Faraday__;
 extern const double __R__;
 double Psi(double ) throw();
 
-//! lua irtual machine for internal computations
+//! lua virtual machine for internal computations
 class VM : public Lua::State
 {
 public:
