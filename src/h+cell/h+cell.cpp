@@ -39,6 +39,15 @@ int main(int argc, char *argv[])
         
         cell.adjust_effectors();
         
+        double t=0;
+        const double dt = 0.1;
+        while(t<1)
+        {
+            const double t1 = t+dt;
+            cell.step(t,t1);
+            t=t1;
+        }
+        
         
         return 0;
     }

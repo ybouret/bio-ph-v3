@@ -44,3 +44,21 @@ void Cell:: compute_fields( array<double> &dYdt, double t, const array<double> &
     dYdt[idxE] = 0;
     
 }
+
+void Cell:: step( double t1, double t2 )
+{
+    //-- prepare initial state
+    sol_ins->save(X);
+    X[idxE] = Em;
+    compute_out(t1);
+    
+    //-- internal computation
+    odeint(drvs,X,t1,t2,ctrl,NULL);
+    
+    
+    //-- save final state
+    sol_ins->load(X);
+    Em = X[idxE];
+    compute_out(t2);
+    
+}

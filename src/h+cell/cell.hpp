@@ -85,7 +85,15 @@ public:
     //! ode API
     void compute_fields( array<double> &dYdt, double t, const array<double> &Y );
     
+    const double dt_ini; //!< a small initial value
+    
+    void step( double t1, double t2);
+    
 private:
+    ode::driverCK<double>::type  odeint;
+    vector<double>               X;
+    double                       ctrl;
+    ode::Field<double>::Equation drvs;
     
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
     chemical::species_ctor species_ctor_cb;

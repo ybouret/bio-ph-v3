@@ -32,6 +32,11 @@ __CELL(surface),
 __CELL(volume),
 Em(0),
 init_ins(),
+dt_ini(1e-4),
+odeint(1e-7),
+X(),
+ctrl(dt_ini),
+drvs(this, & Cell::compute_fields),
 species_ctor_cb(this, & Cell::species_ctor_fn)
 {
     const string code = "function SP_ZERO(t,zeta) return 0; end";
@@ -57,7 +62,17 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     (size_t&)idxE = nsp + 1;
     std::cerr << lib << std::endl;
     
+    //__________________________________________________________________________
+    //
+    // create solver
+    //__________________________________________________________________________
+    odeint.start(nvar);
+    X.make(nvar,0);
+    
+    //__________________________________________________________________________
+    //
     // create solutions
+    //__________________________________________________________________________
     sol_ins.reset( new chemical::solution(lib) );
     sol_out.reset( new chemical::solution(lib) );
     sol_tmp.reset( new chemical::solution(lib) );
@@ -144,6 +159,7 @@ void Cell:: initialize(double t)
     std::cerr << "S_out=" << *sol_out << std::endl;
     std::cerr << "pH_out=" << sol_out->pH() << std::endl;
 
+    ctrl = dt_ini;
 }
 
 
