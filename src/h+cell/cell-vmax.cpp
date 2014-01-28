@@ -28,6 +28,23 @@ void Cell:: adjust_effectors()
         std::cerr << "\tNaK.factor=" << NaK.factor << std::endl;
     }
     
+    const double lam_Cl = lam["Cl-"];
+    {
+        chemical::effector &AE = eff["AE"];
+        if(lam_Cl>0)
+        {
+            throw exception("bad [Cl-] concentrations/potential");
+        }
+        rate.ldz();
+        AE.call(rate, 0.0, zeta, *sol_ins, *sol_out);
+        std::cerr << "AE=" << rate << std::endl;
+        const double rate_Cl = rate["Cl-"];
+        if(rate_Cl<=0)
+            throw exception("bad AE rate!");
+        AE.factor = -lam_Cl/rate_Cl;
+        std::cerr << "\tAE.factor=" << AE.factor << std::endl;
+    }
+    
     
 }
 

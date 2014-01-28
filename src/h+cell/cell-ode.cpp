@@ -38,7 +38,14 @@ void Cell:: compute_fields( array<double> &dYdt, double t, const array<double> &
     // chemical part
     compute_rates(t,zeta);
     sol_tmp->save(dYdt);
-    
+    if(false)
+    {
+        eqs.load_C(Y);
+        eqs.load_dC(dYdt);
+        
+        eqs.legalize_dC(t);
+        eqs.save_dC(dYdt);
+    }
     // physical part
     dYdt[idxE] = 0;
     
