@@ -25,6 +25,8 @@ Cell:: Cell(const string &filename) :
 VM(filename),
 lib(),
 nsp(0),
+nvar(0),
+idxE(0),
 eqs(),
 __CELL(surface),
 __CELL(volume),
@@ -51,6 +53,8 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     (size_t &)nsp = lib.size();
     if(nsp<=0)
         throw exception("no species");
+    (size_t&)nvar = nsp + extra_nvar;
+    (size_t&)idxE = nsp + 1;
     std::cerr << lib << std::endl;
     
     // create solutions

@@ -29,8 +29,11 @@ private:
 class Cell : public VM
 {
 public:
+    static const size_t   extra_nvar = 1; //! for potential
     chemical::collection  lib;     //!< library
     const size_t          nsp;     //!< #species
+    const size_t          nvar;    //!< nsp + extra_nvar
+    const size_t          idxE;    //!< Em index
     chemical::equilibria  eqs;     //!< equilibria
     
     const double          surface; //!< cell surface
@@ -54,8 +57,10 @@ public:
     //! compute inside and outside composition
     void initialize(double t);
     
-    //! collect the passive leaks
+    //! collect the passive leaks into lambda (set values)
     void leak( chemical::solution &lambda, double t, double zeta, const chemical::solution &S, const chemical::solution &S_out);
+    
+  
     
     //! collect Em@t=0 from the current permeabilities
     void compute_Em();
@@ -63,8 +68,25 @@ public:
     //! adjust permeabilities to match Em
     void adjust_Em();
     
+    //! compute effectors factors
+    void adjust_effectors();
+    
+    //! collect the effectors rates
+    void append( chemical::solution &rates, double t, double zeta, const chemical::solution &S, const chemical::solution &S_out);
+    
+    //! in sol_tmp
+    void compute_rates(double t, double zeta);
+    
+    void save_state( array<double> &Y ) const; //!< save inside solution + Em
+    
+    //! load inside solution, set Em, compute oustide solution
+    void load_state( double t, const array<double> &Y );
+    
+    //! ode API
+    void compute_fields( array<double> &dYdt, double t, const array<double> &Y );
     
 private:
+    
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
     chemical::species_ctor species_ctor_cb;
     void                   species_ctor_fn(lua_State *L,chemical::species &sp);

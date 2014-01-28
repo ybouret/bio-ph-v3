@@ -37,6 +37,9 @@ int main(int argc, char *argv[])
         cell.adjust_Em();
         
         
+        cell.adjust_effectors();
+        
+        
         return 0;
     }
     catch(const exception &e)
