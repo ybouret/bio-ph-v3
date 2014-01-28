@@ -115,3 +115,15 @@ ans["Na+"] = -rho/3.0;
 return ans;
 end
 
+-- AE
+K_AE = 10e-3;
+function AE(t,zeta,S,S_out)
+local bicarb = S["HCO3-"];
+local rho = bicarb/(bicarb+K_AE);
+ans = {}
+ans["HCO3-"] = -rho;
+ans["Cl-"]   =  rho;
+end
+
+
+
