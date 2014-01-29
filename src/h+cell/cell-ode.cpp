@@ -29,25 +29,40 @@ void Cell:: load_state( double t, const array<double> &Y )
     
 }
 
+void Cell:: NormalizeState( array<double> &Y, double t)
+{
+    eqs.load_C(Y);
+    if(!eqs.normalize_C(t))
+        throw exception("Invalid Concentrations");
+    eqs.save_C(Y);
+}
 
-void Cell:: compute_fields( array<double> &dYdt, double t, const array<double> &Y )
+
+void Cell:: ComputeFields( array<double> &dYdt, double t, const array<double> &Y )
 {
     load_state(t, Y);
     const double zeta = (Em*__Faraday__)/(__R__*Temperature);
     
-    // chemical part
+    // collect chemical part
     compute_rates(t,zeta);
     sol_tmp->save(dYdt);
-    if(false)
+    
+    // legalize
     {
         eqs.load_C(Y);
         eqs.load_dC(dYdt);
         
         eqs.legalize_dC(t);
         eqs.save_dC(dYdt);
+        sol_tmp->load(dYdt);
     }
+
+    
     // physical part
-    dYdt[idxE] = 0;
+    const double zC    = sol_tmp->sum_zC();           // mol/L
+    const double dCdt  = 1e-15 * zC;                  // mol/microns^3
+    const double dQdt  = __Faraday__ * volume * dCdt; // net charges diff
+    dYdt[idxE] = dQdt / Capa;
     
 }
 
@@ -59,7 +74,7 @@ void Cell:: step( double t1, double t2 )
     compute_out(t1);
     
     //-- internal computation
-    odeint(drvs,X,t1,t2,ctrl,NULL);
+    odeint(drvs,X,t1,t2,ctrl,&cb);
     
     
     //-- save final state

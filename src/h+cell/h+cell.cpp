@@ -48,14 +48,17 @@ int main(int argc, char *argv[])
         
         cell.save_header(fp);
         cell.save_values(t, fp);
-        while(t<1000)
+        while(t<100)
         {
             const double t1 = t+dt;
             cell.step(t,t1);
             //std::cerr << "ctrl=" << cell.ctrl << std::endl;
             t=t1;
             cell.save_values(t,fp);
+            std::cerr << ".";
+            std::cerr.flush();
         }
+        std::cerr << std::endl;
         
         
         return 0;

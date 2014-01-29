@@ -38,6 +38,8 @@ public:
     
     const double          surface; //!< cell surface
     const double          volume;  //!< cell volume
+    const double          Cm;      //!< membrane capacity Farad/microns^2
+    const double          Capa;    //!< Farad
     double                Em;      //!< current potential
     chemical::effectors   eff;     //!< effectors: required: NaK
     
@@ -83,7 +85,7 @@ public:
     void load_state( double t, const array<double> &Y );
     
     //! ode API
-    void compute_fields( array<double> &dYdt, double t, const array<double> &Y );
+    void ComputeFields( array<double> &dYdt, double t, const array<double> &Y );
     
     double dt_ini; //!< a small initial value
     double ctrl;   //!< adaptive control
@@ -97,6 +99,7 @@ private:
     ode::driverCK<double>::type  odeint;
     vector<double>               X;
     ode::Field<double>::Equation drvs;
+    ode::Field<double>::Callback cb;
     
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
     chemical::species_ctor species_ctor_cb;
@@ -104,6 +107,7 @@ private:
     double BiasedPassiveFlux(double zeta);
     double ScaledPassiveFlux(double alpha);
     void   AdjustPermeabilities(double alpha);
+    void   NormalizeState( array<double> &Y, double t);
     
 };
 

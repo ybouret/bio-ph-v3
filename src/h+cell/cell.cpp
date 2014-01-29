@@ -30,13 +30,16 @@ idxE(0),
 eqs(),
 __CELL(surface),
 __CELL(volume),
+__CELL(Cm),        // Farad/microns^2
+Capa(surface*Cm),
 Em(0),
 init_ins(),
 dt_ini(1e-4),
 ctrl(dt_ini),
 odeint(1e-7),
 X(),
-drvs(this, & Cell::compute_fields),
+drvs(this, & Cell::ComputeFields  ),
+cb(  this, & Cell::NormalizeState ),
 species_ctor_cb(this, & Cell::species_ctor_fn)
 {
     const string code = "function SP_ZERO(t,zeta) return 0; end";
@@ -45,8 +48,9 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
     draw_line();
     std::cerr << "-- Cell Description" << std::endl;
     draw_line();
-    std::cerr << "\tsurface=" << surface << " mu^2" << std::endl;
-    std::cerr << "\tvolume =" << volume  << " mu^3" << std::endl;
+    std::cerr << "\tsurface = " << surface << " mu^2" << std::endl;
+    std::cerr << "\tvolume  = " << volume  << " mu^3" << std::endl;
+    std::cerr << "\tcapa    = " << Capa    << std::endl;
     
     //__________________________________________________________________________
     //
