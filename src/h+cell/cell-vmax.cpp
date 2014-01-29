@@ -17,13 +17,13 @@ void Cell:: adjust_effectors()
     {
         chemical::effector &NaK = eff["NaK"];
         if(lam_K>0)
-            throw exception("bad [K+] concentrations/potential");
+        throw exception("bad [K+] concentrations/potential");
         rate.ldz();
         NaK.call(rate,0.0,zeta,*sol_ins,*sol_out);
         std::cerr << "NaK=" << rate << std::endl;
         const double rate_K = rate["K+"];
         if(rate_K<=0)
-            throw exception("bad NaK rate!!");
+        throw exception("bad NaK rate!!");
         NaK.factor = -lam_K/(rate_K);
         std::cerr << "\tNaK.factor=" << NaK.factor << std::endl;
     }
@@ -39,12 +39,25 @@ void Cell:: adjust_effectors()
         AE.call(rate, 0.0, zeta, *sol_ins, *sol_out);
         std::cerr << "AE=" << rate << std::endl;
         const double rate_Cl = rate["Cl-"];
-        if(rate_Cl<=0)
-            throw exception("bad AE rate!");
+        if(rate_Cl<=0) throw exception("bad AE rate!");
         AE.factor = -lam_Cl/rate_Cl;
         std::cerr << "\tAE.factor=" << AE.factor << std::endl;
     }
     
+    const double lam_Na = lam["Na+"];
+    {
+        chemical::effector &NHE = eff["NHE"];
+        const double lam_NHE = -(1.5*lam_K+lam_Na);
+        std::cerr << "lam_NHE=" << lam_NHE << std::endl;
+        if( lam_NHE < 0 ) throw exception("bad leak for Na+/K+ with NHE");
+        rate.ldz();
+        NHE.call(rate,0.0,zeta,*sol_ins,*sol_out);
+        std::cerr << "NHE=" << rate << std::endl;
+        const double rate_Na = rate["Na+"];
+        if( rate_Na<=0) throw exception("bad NHE rate!");
+        NHE.factor = lam_NHE/rate_Na;
+        std::cerr << "\tNHE.factor=" << NHE.factor << std::endl;
+    }
     
 }
 

@@ -47,6 +47,9 @@ void Cell:: ComputeFields( array<double> &dYdt, double t, const array<double> &Y
     compute_rates(t,zeta);
     sol_tmp->save(dYdt);
     
+    //std::cerr << "Y=" << Y << std::endl;
+    //std::cerr << "dYdt1=" << dYdt << std::endl;
+    
     // legalize
     {
         eqs.load_C(Y);
@@ -57,12 +60,17 @@ void Cell:: ComputeFields( array<double> &dYdt, double t, const array<double> &Y
         sol_tmp->load(dYdt);
     }
 
-    
+
     // physical part
     const double zC    = sol_tmp->sum_zC();           // mol/L
     const double dCdt  = 1e-15 * zC;                  // mol/microns^3
     const double dQdt  = __Faraday__ * volume * dCdt; // net charges diff
     dYdt[idxE] = dQdt / Capa;
+    
+    //std::cerr << "dtE=" << dYdt[idxE] << std::endl;
+    
+    
+
     
 }
 

@@ -131,7 +131,8 @@ end
 -- -----------------------------------------------------------------------------
 effectors = {
     "NaK",
-    "AE"
+    "AE",
+    "NHE"
 };
 
 
@@ -141,8 +142,8 @@ function NaK(t,zeta,S,S_out)
 local Na = S["Na+"];
 local rho = 0.5*( 1+ math.tanh(0.39*zeta+1.28)) * (Na/(K_NaK+Na));
 ans = {};
-ans["K+"]  =  rho/2.0;
-ans["Na+"] = -rho/3.0;
+ans["K+"]  =  2*rho;
+ans["Na+"] = -3*rho;
 return ans;
 end
 
@@ -156,6 +157,26 @@ ans["HCO3-"] = -rho;
 ans["Cl-"]   =  rho;
 return ans;
 end
+
+-- NHE
+L0 = 1000;
+Kr = 1.8e-8;
+Kt = 3.6e-6;
+
+function NHE(t,zeta,S,S_out)
+local C    = Kr/Kt;
+local x    = S["H+"]/Kr;
+local xp1  = 1+x;
+local cxp1 = 1+C*x;
+local sig_num = x*xp1 + L0*C*x*cxp1;
+local sig_den = L0*cxp1^2 + xp1^1;
+local sig     = sig_num/sig_den;
+ans = {}
+ans["H+"]  = -sig;
+ans["Na+"] =  sig;
+return ans;
+end
+
 
 
 
