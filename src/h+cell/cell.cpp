@@ -129,13 +129,16 @@ species_ctor_cb(this, & Cell::species_ctor_fn)
         lua_pop(L,1);
     }
     
+    lua_settop(L,0);
     std::cerr << "loading " << init_names << std::endl;
     for(size_t i=1;i<=nout;++i)
     {
         std::cerr << "-- Using '" << init_names[i] << "'" << std::endl;
         chemical::boot::loader init_out;
         chemical::_lua::load(L, init_out, init_names[i], lib);
+        std::cerr << "-- Computing Composition" << std::endl;
         init_out(eqs,lib,0.0);
+        std::cerr <<  "-- Done" << std::endl;
         sol_out->load(eqs.C);
         std::cerr << init_names[i] << "=" << *sol_out << std::endl;
         std::cerr << "\tpH=" << sol_out->pH() << std::endl;
