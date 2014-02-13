@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
         
         cell.adjust_effectors();
         double        t  = 0;
-        const double  dt = 1;
+        const double  dt = 0.2;
         ios::ocstream fp("toto.dat",false);
         
         cell.initialize(t);
@@ -46,6 +46,11 @@ int main(int argc, char *argv[])
         std::cerr << "lambda1=" << *cell.sol_tmp << std::endl;
         
         
+        Lua::Function<double> P_CO2(cell.L,"P_CO2");
+        {
+            ios::ocstream fp("co2.dat",false);
+            fp( "0 %g\n", P_CO2(0));
+        }
         cell.save_header(fp);
         cell.save_values(t, fp);
         while(t<100)
@@ -55,6 +60,10 @@ int main(int argc, char *argv[])
             //std::cerr << "ctrl=" << cell.ctrl << std::endl;
             t=t1;
             cell.save_values(t,fp);
+            {
+                ios::ocstream fp("co2.dat",true);
+                fp( "%g %g\n", t1, P_CO2(t1));
+            }
             std::cerr << ".";
             std::cerr.flush();
         }

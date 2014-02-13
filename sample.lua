@@ -31,10 +31,11 @@ K2      = 5.6e-11;
 
 function P_CO2(t)
 local  P0    = 40.0;
-if (t>=0) and (t<=math.pi) then
-  return P0/760.0 + (10/760.0) * math.sin(t)^2;
+local  W     = 10;
+if (t>=0) and (t<=W*math.pi) then
+  return P0/760.0 + (40.0/760.0) * math.sin(t/W)^2;
 end
-return P0;
+  return P0/760;
 end
 
 function kappa(t)
