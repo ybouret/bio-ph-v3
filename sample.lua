@@ -31,10 +31,10 @@ K2      = 5.6e-11;
 
 function P_CO2(t)
 local  P0    = 40.0;
-local  W     = 10;
-if (t>=0) and (t<=W*math.pi) then
-  return P0/760.0 + (40.0/760.0) * math.sin(t/W)^2;
-end
+--local  W     = 10;
+--if (t>=0) and (t<=W*math.pi) then
+--  return P0/760.0 + (40.0/760.0) * math.sin(t/W)^2;
+--end
   return P0/760;
 end
 
@@ -135,7 +135,30 @@ outside =
 };
 
 function weights(t)
+local t1 = 10
+local t2 = 20
+local t3 = 30
+
+if(t<=0) then
 return 1,0;
+end
+
+if(t<=t1) then
+local w=t/t1;
+return 1-w,w
+end
+
+if(t<=t2)then
+return 0,1;
+end
+
+if(t<=t3)then
+local w = (t-t2)/(t3-t2);
+return w,1-w;
+end
+
+return 1,0;
+
 end
 
 -- -----------------------------------------------------------------------------
