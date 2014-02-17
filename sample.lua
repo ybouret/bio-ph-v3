@@ -122,8 +122,8 @@ init1 =
 {
 	{ 10^(-7.4),    { 1, "H+"  } },
 	{ 0,            { 1, "HY"  }, { 1, "Y-" } },
-	{ 8e-3,         { 1, "K+"  } },
-	{ 140e-3,       { 1, "Na+" } },
+	{ 4e-3,         { 1, "K+"  } },
+	{ 00e-3,        { 1, "Na+" } },
 	{ 100e-3,       { 1, "Cl-" } }
 }
 
@@ -194,10 +194,10 @@ return ans;
 end
 
 -- NHE
-L0 = 1000;
-Kr = 1.8e-8;
-Kt = 3.6e-6;
-
+L0   = 1000;
+Kr   = 1.8e-8;
+Kt   = 3.6e-6;
+KNae = 31e-3;
 function NHE(t,zeta,S,S_out)
 local C    = Kr/Kt;
 local x    = S["H+"]/Kr;
@@ -206,6 +206,9 @@ local cxp1 = 1+C*x;
 local sig_num = x*xp1 + L0*C*x*cxp1;
 local sig_den = L0*cxp1^2 + xp1^1;
 local sig     = sig_num/sig_den;
+local Nae     = S_out["Na+"];
+local sig_out = Nae / (KNae+Nae);
+sig = sig * sig_out;
 ans = {}
 ans["H+"]  = -sig;
 ans["Na+"] =  sig;
