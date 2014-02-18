@@ -2,6 +2,10 @@
 #include "yocto/exception.hpp"
 #include "yocto/fs/vfs.hpp"
 #include "yocto/ios/ocstream.hpp"
+#include "yocto/math/round.hpp"
+#include "yocto/code/utils.hpp"
+
+
 
 int main(int argc, char *argv[])
 {
@@ -30,15 +34,23 @@ int main(int argc, char *argv[])
         std::cerr << "Em=" << cell.Em*1000 << std::endl;
         cell.leak( *cell.sol_tmp, 0.0, (cell.Em*__Faraday__)/(__R__*Temperature), * cell.sol_ins, * cell.sol_out);
         std::cerr << "lambda0=" << *cell.sol_tmp << std::endl;
-
+        
         
         cell.Em = -60e-3;
         cell.adjust_Em();
         
         
         cell.adjust_effectors();
-        double        t  = 0;
-        const double  dt = 0.2;
+        double        t     = 0;
+        const double  t_run   = Lua::Config::Get<lua_Number>(cell.L,"t_run");
+        double        dt      = Lua::Config::Get<lua_Number>(cell.L,"dt");
+        double        dt_save = Lua::Config::Get<lua_Number>(cell.L,"save_every");
+        size_t        every   = 0;
+        
+        simulation_times(dt, dt_save, every);
+        size_t        num_iter = max_of<size_t>(every, ceil(t_run / dt) );
+        while( 0 != (num_iter%every) ) ++num_iter;
+        
         ios::ocstream fp("toto.dat",false);
         
         cell.initialize(t);
@@ -53,19 +65,23 @@ int main(int argc, char *argv[])
         }
         cell.save_header(fp);
         cell.save_values(t, fp);
-        while(t<100)
+        
+        for(size_t iter=1;iter<=num_iter;++iter)
         {
-            const double t1 = t+dt;
+            t               = (iter-1) * dt;
+            const double t1 = iter*dt;
             cell.step(t,t1);
-            //std::cerr << "ctrl=" << cell.ctrl << std::endl;
             t=t1;
-            cell.save_values(t,fp);
+            if(0 == (iter%every) )
             {
-                ios::ocstream fp("co2.dat",true);
-                fp( "%g %g\n", t1, P_CO2(t1));
+                cell.save_values(t,fp);
+                {
+                    ios::ocstream fp("co2.dat",true);
+                    fp( "%g %g\n", t, P_CO2(t1));
+                }
+                std::cerr << ".";
+                std::cerr.flush();
             }
-            std::cerr << ".";
-            std::cerr.flush();
         }
         std::cerr << std::endl;
         
