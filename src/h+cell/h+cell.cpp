@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
         cell.save_header(fp);
         cell.save_values(t, fp);
         
+        size_t num_out=0;
         for(size_t iter=1;iter<=num_iter;++iter)
         {
             t               = (iter-1) * dt;
@@ -80,7 +81,10 @@ int main(int argc, char *argv[])
                     fp( "%g %g\n", t, P_CO2(t1));
                 }
                 std::cerr << ".";
+                ++num_out;
+                if(0==(num_out%32)) std::cerr << std::endl;
                 std::cerr.flush();
+                
             }
         }
         std::cerr << std::endl;

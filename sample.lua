@@ -102,7 +102,7 @@ inside =
     { 140e-3,      { 1, "K+"  } },
 	{ 10e-3,       { 1, "Na+" } },
 	{ 20e-3,       { 1, "Cl-" } },
-    { 0.000,       { 1, "HY"}, {1,"Y-"} }
+    { 60e-3,       { 1, "HY"}, {1,"Y-"} }
 };
 
 -- ---------------------------------------------------------------------
@@ -120,10 +120,10 @@ init0 =
 
 init1 =
 {
-	{ 10^(-7.4),    { 1, "H+"  } },
+	{ 10^(-6.5),    { 1, "H+"  } },
 	{ 0,            { 1, "HY"  }, { 1, "Y-" } },
 	{ 4e-3,         { 1, "K+"  } },
-	{ 0e-3,        { 1, "Na+" } },
+	{ 140e-3,       { 1, "Na+" } },
 	{ 100e-3,       { 1, "Cl-" } }
 }
 
@@ -136,8 +136,8 @@ outside =
 
 function weights(t)
 local t1 = 10
-local t2 = 20
-local t3 = 30
+local t2 = 30*60+t1;
+local t3 = 10+t2;
 
 if(t<=0) then
 return 1,0;
@@ -194,10 +194,11 @@ return ans;
 end
 
 -- NHE
-L0   = 1000;
-Kr   = 1.8e-8;
-Kt   = 3.6e-6;
-KNae = 31e-3;
+L0    = 1000;
+Kr    = 1.8e-8;
+Kt    = 3.6e-6;
+KNae  = 31e-3;
+KHout = 2e-7;
 function NHE(t,zeta,S,S_out)
 local C    = Kr/Kt;
 local x    = S["H+"]/Kr;
@@ -207,7 +208,8 @@ local sig_num = x*xp1 + L0*C*x*cxp1;
 local sig_den = L0*cxp1^2 + xp1^1;
 local sig     = sig_num/sig_den;
 local Nae     = S_out["Na+"];
-local sig_out = Nae / (KNae+Nae);
+local KNaeEff = KNae * (1+S_out["H+"]/KHout);
+local sig_out = Nae / (KNaeEff+Nae);
 sig = sig * sig_out;
 ans = {}
 ans["H+"]  = -sig;
@@ -215,8 +217,8 @@ ans["Na+"] =  sig;
 return ans;
 end
 
-t_run      = 60*10;
+t_run      = 60*60;
 dt         = 0.1;
-save_every = 1;
+save_every = 10;
 
 
