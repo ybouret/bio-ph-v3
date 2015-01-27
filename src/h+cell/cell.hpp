@@ -11,12 +11,16 @@ class HCell
 {
 public:
 
-    explicit HCell( lua_State *vm, const string &libID);
+    explicit HCell(lua_State *vm,
+                   const string &libID,
+                   const string &eqsID,
+                   const string &effID);
     virtual ~HCell() throw();
 
-    lua_State     *L;
-    __lua::Library lib;
-    
+    lua_State        *L;
+    __lua::Library    lib;
+    __lua::Equilibria eqs;
+    __lua::Effectors  eff;
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);

@@ -4,9 +4,14 @@ HCell:: ~HCell() throw()
 {
 }
 
-HCell:: HCell( lua_State *vm, const string &libID) :
+HCell:: HCell( lua_State *vm,
+              const string &libID,
+              const string &eqsID,
+              const string &effID) :
 L(vm),
-lib(vm, libID.c_str() )
+lib(L, libID.c_str() ),
+eqs(L, eqsID.c_str(),lib),
+eff(L, effID.c_str() )
 {
 }
 
