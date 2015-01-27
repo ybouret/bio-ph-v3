@@ -26,12 +26,9 @@ int main(int argc, char *argv[])
             Lua::Config::DoString(L, argv[i]);
         }
 
-        string libID = "lib";
-        string eqsID = "eqs";
-        string effID = "eff";
-        string iniID = "ini";
 
-        HCell cell(L,0.0,libID,eqsID,effID,iniID);
+
+        HCell cell(L,0.0);
 
         return 0;
     }

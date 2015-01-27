@@ -18,3 +18,18 @@ ini =
 {
     { "E/N" }
 };
+
+
+out1 =
+{
+    { "E/N" }
+};
+
+out =
+{
+    "out1"
+};
+
+function weight(t)
+return 1
+end

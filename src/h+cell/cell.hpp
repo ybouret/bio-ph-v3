@@ -14,11 +14,7 @@ public:
     static const size_t NUM_PARAMS;
 
     explicit HCell(lua_State    *vm,
-                   const double  t0,
-                   const string &libID,
-                   const string &eqsID,
-                   const string &effID,
-                   const string &iniID);
+                   const double  t0);
     virtual ~HCell() throw();
 
     lua_State        *L;
@@ -29,8 +25,9 @@ public:
     parameters        params; //!< extra parameters
     const size_t      nvar;   //!< #nvar for all
     __lua::Effectors  eff;    //!< effectors
-    vector_t          S0;     //!< initial inside concentration
-    
+    vector_t          S0;     //!< initial inside concentration (+extra vars)
+    matrix_t          out;    //!< possible outside solutions
+
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);
 };
