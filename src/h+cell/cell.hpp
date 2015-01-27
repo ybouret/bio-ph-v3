@@ -10,6 +10,8 @@ using namespace chemical;
 class HCell
 {
 public:
+    static const char  *PARAMETERS[];
+    static const size_t NUM_PARAMS;
 
     explicit HCell(lua_State *vm,
                    const string &libID,
@@ -21,6 +23,7 @@ public:
     __lua::Library    lib;
     __lua::Equilibria eqs;
     __lua::Effectors  eff;
+    parameters        params;
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);
