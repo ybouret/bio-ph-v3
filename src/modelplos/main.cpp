@@ -29,8 +29,9 @@ int main(int argc, char *argv[])
         string libID = "lib";
         string eqsID = "eqs";
         string effID = "eff";
+        string iniID = "ini";
 
-        HCell cell(L,libID,eqsID,effID);
+        HCell cell(L,0.0,libID,eqsID,effID,iniID);
 
         return 0;
     }
