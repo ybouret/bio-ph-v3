@@ -1,6 +1,7 @@
 
 -- standard
-exp = math.exp;
+exp  = math.exp;
+tanh = math.tanh;
 
 lib =
 {
@@ -19,8 +20,10 @@ eqs =
 
 eff =
 {
-    "leak_Na",
-    "leak_K"
+    "j_Na",
+    "j_K",
+    "j_Cl",
+    "NaK"
 };
 
 
@@ -68,9 +71,19 @@ function weights(t)
 return 0.8,0.2
 end
 
-function leak_Na(t,Cin,Cout,params)
+function TableSumValues(X)
+ans = 0;
+for key,value in pairs(X) do ans = ans+value; end
+return ans;
+end
+
+function j_Na(t,Cin,Cout,params)
 local zz = params["zeta"];
 local Na = "Na+";
+
+-- for key,value in pairs(Cin) do print(key,value) end
+-- print(TableSumValues(Cin));
+
 a = {};
 local rho = -Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz));
 a[Na] = rho;
@@ -78,7 +91,7 @@ return a;
 end
 
 
-function leak_K(t,Cin,Cout,params)
+function j_K(t,Cin,Cout,params)
 local zz = params["zeta"];
 local K  = "K+";
 a = {};
@@ -87,7 +100,7 @@ a[K] = rho;
 return a;
 end
 
-function leak_Cl(t,Cin,Cout,params)
+function j_Cl(t,Cin,Cout,params)
 local zz = -params["zeta"];
 local Cl = "Cl-";
 a = {};
@@ -95,4 +108,19 @@ local rho = -Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz));
 a[Cl] = rho;
 return a;
 end
+
+
+K_NaK = 12e-3;
+
+function NaK(t,Cin,Cout,params)
+local zeta  = params["zeta"];
+local CNa   = Cin["Na+"];
+local sig   = (CNa/(K_NaK+CNa)) * (1+tanh(0.39*zeta+1.28))*0.5;
+a = {}
+a["K+"]  =  2*sig;
+a["Na+"] = -3*sig;
+return a;
+end
+
+
 
