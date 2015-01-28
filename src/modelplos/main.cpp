@@ -31,6 +31,10 @@ int main(int argc, char *argv[])
         HCell cell(L,0.0);
 
         cell.ComputeOutsideComposition(0.0);
+        const double zm = cell.ComputeRestingZeta(0.0);
+
+        std::cerr << "Resting Zeta=" << zm << std::endl;
+        std::cerr << "Em=" << zm * cell.Z2E*1000.0 << " mV" << std::endl;
 
         return 0;
     }

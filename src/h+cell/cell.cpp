@@ -23,11 +23,19 @@ eqs(L, "eqs",lib),
 N(eqs.N),
 M(eqs.M),
 params(lib,PARAMETERS,NUM_PARAMS),
+iZeta( params["zeta"] ),
 nvar(params.nvar),
 eff(L, "eff" ),
 inside0(nvar,0),
 outside(),
-out()
+out(),
+weights(),
+in(nvar,0),
+tmx(0),
+rho(M,0),
+Temperature(298),
+E2Z(Y_FARADAY/(Y_R*Temperature)),
+Z2E((Y_R*Temperature)/Y_FARADAY)
 {
     std::cerr << lib << std::endl;
     std::cerr << eqs << std::endl;
@@ -45,6 +53,7 @@ out()
     }
     std::cerr << "inside0=" << std::endl;
     lib.display(std::cerr,inside0) << std::endl;
+    in = inside0;
 
     //__________________________________________________________________________
     //
@@ -69,7 +78,7 @@ out()
 void HCell:: ComputeOutsideComposition(const double t)
 {
     const size_t ns = outside.rows; assert(ns>0);
-    vector_t     weights(ns,0.0);
+    weights.make(ns,0.0);
     lua_settop(L,0);
     lua_getglobal(L, "weights");
 
@@ -83,7 +92,7 @@ void HCell:: ComputeOutsideComposition(const double t)
         throw exception("weights(%g): %s",t,err);
     }
 
-    // get weights
+    //-- get weights
     for(size_t i=ns;i>0;--i)
     {
         if( !lua_isnumber(L, -1))
@@ -97,5 +106,43 @@ void HCell:: ComputeOutsideComposition(const double t)
     eqs.mix(out, outside, weights, t);
     std::cerr << "out=" << out << std::endl;
 }
+
+const double HCell:: ZETA_MAX = 5.0;
+
+#include "yocto/math/fcn/zfind.hpp"
+
+double HCell:: ComputeRestingZeta(const double t)
+{
+    tmx = t;
+    const double zeta_step = 0.1;
+    double zeta = 0.1;
+    numeric<double>::function F(this, & HCell:: ComputeFluxes);
+    do
+    {
+        const double Fm = F(-zeta);
+        const double Fp = F( zeta);
+        //std::cerr << "zeta=" << zeta << ", Em=" << Z2E * zeta << ", Fm=" << Fm << ", Fp=" << Fp << std::endl;
+        if(Fm*Fp<0)
+        {
+            break;
+        }
+        zeta += zeta_step;
+        if(zeta>ZETA_MAX)
+            throw exception("Cannot find a resting potential!");
+    }
+    while(true);
+
+    zfind<double> solve(0);
+    zeta = solve(F,-zeta,zeta);
+    return zeta;
+}
+
+double HCell:: ComputeFluxes(double zeta)
+{
+    in[iZeta] = zeta;
+    eff.rate(rho, tmx, in, out, params);
+    return lib.charge(rho);
+}
+
 
 
