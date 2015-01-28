@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
 
         HCell cell(L,0.0);
 
+        cell.ComputeOutsideComposition(0.0);
+
         return 0;
     }
     catch( const exception &e)
