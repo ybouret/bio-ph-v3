@@ -1,5 +1,6 @@
 #include "cell.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/lua/lua-config.hpp"
 
 HCell:: ~HCell() throw()
 {
@@ -10,7 +11,8 @@ const char *HCell:: PARAMETERS[] =
 {
     "zeta",
     "volume",
-    "surface"
+    "surface",
+    "activeS"
 };
 
 const size_t HCell:: NUM_PARAMS = sizeof(PARAMETERS)/sizeof(PARAMETERS[0]);
@@ -24,6 +26,9 @@ N(eqs.N),
 M(eqs.M),
 params(lib,PARAMETERS,NUM_PARAMS),
 iZeta( params["zeta"] ),
+iVolume( params["volume"] ),
+iSurface(params["surface"]),
+iActiveS(params["activeS"]),
 nvar(params.nvar),
 eff(L, "eff" ),
 inside0(nvar,0),
@@ -71,7 +76,24 @@ Z2E((Y_R*Temperature)/Y_FARADAY)
         lib.display(std::cerr,outside[i]) << std::endl;
     }
 
+
+
     out.make(M,0.0);
+
+
+    //__________________________________________________________________________
+    //
+    // Loading other parameters
+    //__________________________________________________________________________
+    inside0[iZeta]    = 0;
+    inside0[iVolume]  = Lua::Config::Get<lua_Number>(L,"volume");
+    inside0[iSurface] = Lua::Config::Get<lua_Number>(L,"surface");
+    inside0[iActiveS] = inside0[iSurface];
+
+    std::cerr << "volume =" << inside0[iVolume]  << " mu^3" << std::endl;
+    std::cerr << "surface=" << inside0[iSurface] << " mu^2" << std::endl;
+
+
 }
 
 

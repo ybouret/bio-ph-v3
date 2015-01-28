@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 
         Lua::State VM;
         lua_State *L = VM();
+        __lua::register_functions(L);
         if(argc>1)
         {
             Lua::Config::DoFile(L,argv[1]);
