@@ -37,9 +37,9 @@ eqs =
 
 eff =
 {
-    "j_Na",
-    "j_K",
-    "j_Cl",
+    "lambda_Na",
+    "lambda_K",
+    "lambda_Cl",
     "NaK"
 };
 
@@ -131,62 +131,10 @@ function SP_Na(t,x)
 return (1.360058333) * exp( (0.05223441992) * x );
 end
 
+Cm = 10 * 1.0e-15; -- Farad/ micron^2
 
--- -----------------------------------------------------------------------------
--- outward Na flux
--- -----------------------------------------------------------------------------
-function j_Na(t,Cin,Cout,params)
-local zeta = params["zeta"];
-local zz   = zeta;
-local Na = "Na+";
-a = {};
-local rho = -Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta)/surface;
-a[Na] = rho;
-return a;
-end
-
--- -----------------------------------------------------------------------------
--- outward potassium flux
--- -----------------------------------------------------------------------------
-function j_K(t,Cin,Cout,params)
-local zeta = params["zeta"];
-local zz   = zeta;
-local K  = "K+";
-a = {};
-local rho = -Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta)/surface;
-a[K] = rho;
-return a;
-end
-
--- -----------------------------------------------------------------------------
--- outward chloride flux
--- -----------------------------------------------------------------------------
-function j_Cl(t,Cin,Cout,params)
-local zeta = params["zeta"];
-local zz   = -zeta;
-local Cl = "Cl-";
-a = {};
-local rho = -Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta)/surface;
-a[Cl] = rho;
-return a;
-end
-
--- -----------------------------------------------------------------------------
--- NaK/ATPase OUTWARD flux
--- -----------------------------------------------------------------------------
-K_NaK = 12e-3;
-
-function NaK(t,Cin,Cout,params)
-local zeta  = params["zeta"];
-local CNa   = Cin["Na+"];
-local sig   = (CNa/(K_NaK+CNa)) * (1+tanh(0.39*zeta+1.28))*0.5;
-local rho   = sig/surface;
-a = {}
-a["K+"]  =  -2*rho;
-a["Na+"] =   3*rho;
-return a;
-end
-
+Capa_exp = 207e-12;       -- from article 207 pF
+Surf_exp = Capa_exp / Cm; -- in micron^2
 
 -- -----------------------------------------------------------------------------
 --
@@ -201,5 +149,92 @@ c = 5;
 
 surface = EllipsoidSurface(a,b,c);
 volume  = EllipsoidVolume(a,b,c);
+
+-- channels extrapolations
+passive_ratio = surface/Surf_exp;
+
+-- -----------------------------------------------------------------------------
+-- INWARD Na moles/s
+-- -----------------------------------------------------------------------------
+function lambda_Na(t,Cin,Cout,params)
+local zeta = params["zeta"];
+local zz   = zeta;
+local Na = "Na+";
+a = {};
+local rho = Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta);
+a[Na] = rho*passive_ratio;
+return a;
+end
+
+-- -----------------------------------------------------------------------------
+-- INWARD potassium moles/s
+-- -----------------------------------------------------------------------------
+function lambda_K(t,Cin,Cout,params)
+local zeta = params["zeta"];
+local zz   = zeta;
+local K  = "K+";
+a = {};
+local rho = Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta);
+a[K] = rho*passive_ratio;
+return a;
+end
+
+-- -----------------------------------------------------------------------------
+-- INWARD chloride moles/s
+-- -----------------------------------------------------------------------------
+function lambda_Cl(t,Cin,Cout,params)
+local zeta = params["zeta"];
+local zz   = -zeta;
+local Cl = "Cl-";
+a = {};
+local rho = Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta);
+a[Cl] = rho*passive_ratio;
+return a;
+end
+
+-- -----------------------------------------------------------------------------
+-- NaK/ATPase INWARD moles/s
+-- -----------------------------------------------------------------------------
+K_NaK = 12e-3;
+
+function NaK(t,Cin,Cout,params)
+local zeta  = params["zeta"];
+local CNa   = Cin["Na+"];
+local sig   = (CNa/(K_NaK+CNa)) * (1+tanh(0.39*zeta+1.28))*0.5;
+local rho   = sig;
+a = {}
+a["K+"]  =  2*rho;
+a["Na+"] = -3*rho;
+return a;
+end
+
+-- -----------------------------------------------------------------------------
+-- NHE INWARD moles/s
+-- -----------------------------------------------------------------------------
+
+L0    = 1000;
+Kr    = 1.8e-8;
+Kt    = 3.6e-6;
+KNae  = 31e-3;
+KHout = 2e-7;
+function NHE(t,Cin,Cout,params)
+local C    = Kr/Kt;
+local x    = Cin["H+"]/Kr;
+local xp1  = 1+x;
+local cxp1 = 1+C*x;
+local sig_num = x*xp1 + L0*C*x*cxp1;
+local sig_den = L0*cxp1^2 + xp1^1;
+local sig     = sig_num/sig_den;
+local Nae     = Cout["Na+"];
+local KNaeEff = KNae * (1+Cout["H+"]/KHout);
+local sig_out = Nae / (KNaeEff+Nae);
+sig = sig * sig_out;
+ans = {}
+ans["H+"]  = -sig;
+ans["Na+"] =  sig;
+return ans;
+end
+
+
 
 
