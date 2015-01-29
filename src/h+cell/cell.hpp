@@ -1,12 +1,9 @@
 #ifndef H_CELL_INCLUDED
 #define H_CELL_INCLUDED 1
 
-#include "yocto/chemical/lua/io.hpp"
+#include "luavm.hpp"
 #include "yocto/physics/constants.hpp"
 
-using namespace yocto;
-using namespace math;
-using namespace chemical;
 
 class HCell
 {
@@ -63,7 +60,7 @@ private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);
     //! compute individual fluxes from effectors
     /**
-     \return the molar charges
+     \return the algebraic signed flux
      */
     double ComputeFluxes(double zeta);
 

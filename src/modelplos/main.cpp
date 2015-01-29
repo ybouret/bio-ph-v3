@@ -1,9 +1,9 @@
-#include "../h+cell/cell.hpp"
+#include "cell.hpp"
 
-#include "yocto/lua/lua-state.hpp"
 #include "yocto/lua/lua-config.hpp"
-
 #include "yocto/exception.hpp"
+
+
 
 int main(int argc, char *argv[])
 {
@@ -14,10 +14,8 @@ int main(int argc, char *argv[])
         // setting up Lua
         //
         //----------------------------------------------------------------------
-
-        Lua::State VM;
+        LuaVM VM;
         lua_State *L = VM();
-        __lua::register_functions(L);
         if(argc>1)
         {
             Lua::Config::DoFile(L,argv[1]);
@@ -29,14 +27,15 @@ int main(int argc, char *argv[])
 
 
 
-        HCell cell(L,0.0);
+        Cell cell(L,0.0);
+        const double zm0 = cell.SteadyStateZeta();
+        std::cerr << "Zm0=" << zm0 << std::endl;
+        std::cerr << "Em0=" << zm0 * cell.Z2E*1000.0 << " mV" << std::endl;
+        cell.SetSteadyStatePotential(-40.0e-3);
+        const double zm1 = cell.SteadyStateZeta();
+        std::cerr << "Em1=" << zm1 * cell.Z2E*1000.0 << " mV" << std::endl;
 
-        cell.ComputeOutsideComposition(0.0);
-        const double zm = cell.ComputeRestingZeta(0.0);
-
-        std::cerr << "Resting Zeta=" << zm << std::endl;
-        std::cerr << "Em=" << zm * cell.Z2E*1000.0 << " mV" << std::endl;
-
+        
         return 0;
     }
     catch( const exception &e)

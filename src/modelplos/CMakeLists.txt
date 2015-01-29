@@ -1,4 +1,5 @@
 ADD_EXECUTABLE(modelplos main.cpp
+	cell.hpp cell.cpp
 	model.lua
 )
 

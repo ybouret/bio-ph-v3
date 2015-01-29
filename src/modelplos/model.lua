@@ -95,7 +95,7 @@ out =
 
 
 function weights(t)
-return 0.8,0.2
+return 1.0,0.0
 end
 
 -- -----------------------------------------------------------------------------
@@ -131,7 +131,17 @@ function SP_Na(t,x)
 return (1.360058333) * exp( (0.05223441992) * x );
 end
 
+-- -----------------------------------------------------------------------------
+-- Common surface capacitance
+-- -----------------------------------------------------------------------------
+
+
 Cm = 10 * 1.0e-15; -- Farad/ micron^2
+
+-- -----------------------------------------------------------------------------
+-- Article from which the permeabilities were fitted
+-- -----------------------------------------------------------------------------
+
 
 Capa_exp = 207e-12;       -- from article 207 pF
 Surf_exp = Capa_exp / Cm; -- in micron^2
@@ -150,8 +160,6 @@ c = 5;
 surface = EllipsoidSurface(a,b,c);
 volume  = EllipsoidVolume(a,b,c);
 
--- channels extrapolations
-passive_ratio = surface/Surf_exp;
 
 -- -----------------------------------------------------------------------------
 -- INWARD Na moles/s
@@ -161,8 +169,8 @@ local zeta = params["zeta"];
 local zz   = zeta;
 local Na = "Na+";
 a = {};
-local rho = Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta);
-a[Na] = rho*passive_ratio;
+local rho = Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta)/Surf_exp;
+a[Na] = rho;
 return a;
 end
 
@@ -174,8 +182,8 @@ local zeta = params["zeta"];
 local zz   = zeta;
 local K  = "K+";
 a = {};
-local rho = Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta);
-a[K] = rho*passive_ratio;
+local rho = Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta)/Surf_exp;
+a[K] = rho;
 return a;
 end
 
@@ -187,8 +195,8 @@ local zeta = params["zeta"];
 local zz   = -zeta;
 local Cl = "Cl-";
 a = {};
-local rho = Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta);
-a[Cl] = rho*passive_ratio;
+local rho = Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta)/Surf_exp;
+a[Cl] = rho;
 return a;
 end
 
