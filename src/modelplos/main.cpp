@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
         const double zm1 = cell.SteadyStateZeta();
         std::cerr << "Em1=" << zm1 * cell.Z2E*1000.0 << " mV" << std::endl;
 
-        
+        cell.Setup(-60.0e-3);
+
         return 0;
     }
     catch( const exception &e)

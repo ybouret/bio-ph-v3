@@ -42,7 +42,7 @@ public:
     matrix_t          outside;     //!< possible outside solutions
     vector_t          out;         //!< resulting from mix, using the lua "weights" function
     vector_t          weights;     //!< to store wetighs
-    vector_t          in;          //!< temporary, nvar
+    vector_t          in;          //!< temporary, nvar, initialized to inside0
     double            tmx;         //!< local time
     vector_t          rho;         //!< temporary rates, #M
     const double      Temperature; //!<

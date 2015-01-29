@@ -23,6 +23,8 @@ public:
     //! set Potential to Em using lambda_K.pace @t=0
     void   SetSteadyStatePotential(double Em);
 
+    //! SetSteady state and all paces
+    void Setup(double Em);
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
