@@ -38,7 +38,7 @@ public:
     const size_t      iActiveS;    //!< active surface, initially surface
     const size_t      nvar;        //!< #nvar for all
     __lua::Effectors  eff;         //!< effectors
-    vector_t          inside0;     //!< initial inside concentration (+extra vars)
+    vector_t          inside;      //!< initial inside concentration (+extra vars)
     matrix_t          outside;     //!< possible outside solutions
     vector_t          out;         //!< resulting from mix, using the lua "weights" function
     vector_t          weights;     //!< to store wetighs
@@ -48,11 +48,20 @@ public:
     const double      Temperature; //!<
     const double      E2Z;         //!< F/(RT)
     const double      Z2E;         //!< (RT)/F;
-    
+
+    diff_solver   odeint;
+    const double  diff_h; //!< initial time step for each dt
+
     //! using outside solutions...
+    /**
+     The result is set in out
+     */
     void   ComputeOutsideComposition(const double t);
 
     //! using in and out
+    /**
+     store the result in inside[iZeta] as well
+     */
     double ComputeRestingZeta(const double t);
 
 

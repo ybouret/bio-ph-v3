@@ -38,8 +38,15 @@ int main(int argc, char *argv[])
         cell.Setup(-60.0e-3);
 
         vector_t Y(cell.nvar,0);
-        tao::set(Y,cell.inside0);
+        tao::set(Y,cell.inside);
+        std::cerr << "zeta   =" << Y[cell.iZeta]    << ", Em=" << Y[cell.iZeta]*cell.Z2E*1000.0 << std::endl;
+        std::cerr << "volume =" << Y[cell.iVolume]  << std::endl;
+        std::cerr << "surface=" << Y[cell.iSurface] << std::endl;
+        std::cerr << "activeS=" << Y[cell.iActiveS] << std::endl;
 
+        std::cerr << "Y=" << Y << std::endl;
+        cell.Step(Y,0,1);
+        
 
 
         return 0;

@@ -18,9 +18,8 @@ public:
     effector     &NHE;
     effector     &AE2;
     effector     &NaK;
-    diff_equation DiffEq;
+    diff_equation diffeq;
     
-
     explicit Cell( lua_State *vm, const double t);
     virtual ~Cell() throw();
 
@@ -36,7 +35,7 @@ public:
     //! SetSteady state and all paces
     void Setup(double Em);
 
-
+    void Step(array<double> &Y, double t0, double t1);
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);

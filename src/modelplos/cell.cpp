@@ -1,6 +1,7 @@
 #include "cell.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/tao.hpp"
+#include "yocto/lua/lua-config.hpp"
 
 Cell:: ~Cell() throw() {}
 
@@ -16,9 +17,9 @@ leak_Cl( eff["lambda_Cl"] ),
 NHE( eff["NHE"] ),
 AE2( eff["AE2"] ),
 NaK( eff["NaK"] ),
-DiffEq(this, &Cell::Rates)
+diffeq(this, &Cell::Rates)
 {
-    
+    //odeint.start(nvar);
 }
 
 #include "yocto/math/fcn/zfind.hpp"
@@ -26,7 +27,7 @@ DiffEq(this, &Cell::Rates)
 double Cell:: SteadyStateZeta()
 {
     tmx = 0.0;
-    in  = inside0;
+    in  = inside;
     ComputeOutsideComposition(tmx);
 
     
@@ -99,7 +100,7 @@ void  Cell:: SetSteadyStatePotential(double Em)
     std::cerr << "increased by " << pace << std::endl;
     leak_K.pace = pace;
 
-    inside0[iZeta] = in[iZeta];
+    inside[iZeta] = in[iZeta];
 }
 
 double Cell:: ComputePassiveZeroKFlux(double pace)
@@ -112,7 +113,7 @@ double Cell:: ComputePassiveZeroKFlux(double pace)
 void Cell:: Setup(double Em)
 {
     ComputeOutsideComposition(0.0);
-    in = inside0;
+    in = inside;
     
     //__________________________________________________________________________
     //
@@ -176,11 +177,11 @@ void Cell:: Setup(double Em)
     std::cerr << std::endl;
     eff.rate(rho, tmx, in, out, params);
     std::cerr << "rho=" << std::endl;
-    lib.display(std::cerr, rho);
+    lib.display(std::cerr, rho) << std::endl;;
 
     eqs.absorb(tmx, rho, in);
     std::cerr << "rho1=" << std::endl;
-    lib.display(std::cerr, rho);
+    lib.display(std::cerr, rho) << std::endl;
 
 }
 
@@ -214,7 +215,13 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
 
     //__________________________________________________________________________
     //
-    //evaluate concentration changes
+    // electric equation...
+    //__________________________________________________________________________
+
+
+    //__________________________________________________________________________
+    //
+    //evaluate concentration changes per unit of time
     //__________________________________________________________________________
     const double ratio = activeS/volume;
 
@@ -225,11 +232,17 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
 
     //__________________________________________________________________________
     //
-    //chemical absorption
+    //chemical absorption + constants variation
     //__________________________________________________________________________
     eqs.absorb(t, dYdt, Y);
     
 
 }
 
+
+void Cell:: Step(array<double> &Y, double t0, double t1)
+{
+    double hh = diff_h;
+    odeint(diffeq,Y,t0,t1,hh,&eqs.callback);
+}
 

@@ -31,7 +31,7 @@ iSurface(params["surface"]),
 iActiveS(params["activeS"]),
 nvar(params.nvar),
 eff(L, "eff" ),
-inside0(nvar,0),
+inside(nvar,0),
 outside(),
 out(),
 weights(),
@@ -40,7 +40,9 @@ tmx(0),
 rho(M,0),
 Temperature(298),
 E2Z(Y_FARADAY/(Y_R*Temperature)),
-Z2E((Y_R*Temperature)/Y_FARADAY)
+Z2E((Y_R*Temperature)/Y_FARADAY),
+odeint( Lua::Config::Get<lua_Number>(L,"ftol")   ),
+diff_h( Lua::Config::Get<lua_Number>(L,"diff_h") )
 {
     std::cerr << lib << std::endl;
     std::cerr << eqs << std::endl;
@@ -54,11 +56,11 @@ Z2E((Y_R*Temperature)/Y_FARADAY)
     {
         boot ini;
         __lua::load(L,ini, "ini", lib);
-        eqs.create(inside0, ini, t0);
+        eqs.create(inside, ini, t0);
     }
-    std::cerr << "inside0=" << std::endl;
-    lib.display(std::cerr,inside0) << std::endl;
-    in = inside0;
+    std::cerr << "inside=" << std::endl;
+    lib.display(std::cerr,inside) << std::endl;
+    in = inside;
 
     //__________________________________________________________________________
     //
@@ -85,15 +87,19 @@ Z2E((Y_R*Temperature)/Y_FARADAY)
     //
     // Loading other parameters
     //__________________________________________________________________________
-    inside0[iZeta]    = 0;
-    inside0[iVolume]  = Lua::Config::Get<lua_Number>(L,"volume");
-    inside0[iSurface] = Lua::Config::Get<lua_Number>(L,"surface");
-    inside0[iActiveS] = inside0[iSurface];
+    inside[iZeta]    = 0;
+    inside[iVolume]  = Lua::Config::Get<lua_Number>(L,"volume");
+    inside[iSurface] = Lua::Config::Get<lua_Number>(L,"surface");
+    inside[iActiveS] = inside[iSurface];
 
-    std::cerr << "volume =" << inside0[iVolume]  << " mu^3" << std::endl;
-    std::cerr << "surface=" << inside0[iSurface] << " mu^2" << std::endl;
+    std::cerr << "volume =" << inside[iVolume]  << " mu^3" << std::endl;
+    std::cerr << "surface=" << inside[iSurface] << " mu^2" << std::endl;
 
-
+    //__________________________________________________________________________
+    //
+    // preparing integrator
+    //__________________________________________________________________________
+    odeint.start(nvar);
 }
 
 
@@ -156,7 +162,7 @@ double HCell:: ComputeRestingZeta(const double t)
 
     zfind<double> solve(0);
     zeta = solve(F,-zeta,zeta);
-    inside0[iZeta] = zeta;
+    inside[iZeta] = zeta;
     return zeta;
 }
 
