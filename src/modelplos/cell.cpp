@@ -1,5 +1,6 @@
 #include "cell.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/math/kernel/tao.hpp"
 
 Cell:: ~Cell() throw() {}
 
@@ -8,8 +9,15 @@ HCell(vm,t),
 iNa( lib["Na+"]->indx ),
 iK(  lib["K+"]->indx  ),
 iCl( lib["Cl-"]->indx ),
-iH(  lib["H+"]->indx  )
+iH(  lib["H+"]->indx  ),
+leak_K(  eff["lambda_K"]  ),
+leak_Na( eff["lambda_Na"] ),
+leak_Cl( eff["lambda_Cl"] ),
+NHE( eff["NHE"] ),
+AE2( eff["AE2"] ),
+NaK( eff["NaK"] )
 {
+    
 }
 
 #include "yocto/math/fcn/zfind.hpp"
@@ -52,21 +60,18 @@ double Cell:: SteadyStateZeta()
 
 double Cell:: ComputePassiveZeroFlux(double zeta)
 {
-    effector &lambda_K  = eff["lambda_K"];
-    effector &lambda_Na = eff["lambda_Na"];
-    effector &lambda_Cl = eff["lambda_Cl"];
 
     in[iZeta] = zeta;
 
     double ans = 0;
-    lambda_K.rate(rho, tmx, in, out, params);
-    ans += 1.5 * rho[ iK ] * lambda_K.pace;
+    leak_K.rate(rho, tmx, in, out, params);
+    ans += 1.5 * rho[ iK ] * leak_K.pace;
 
-    lambda_Na.rate(rho, tmx, in, out, params);
-    ans += rho[ iNa ] * lambda_Na.pace;
+    leak_Na.rate(rho, tmx, in, out, params);
+    ans += rho[ iNa ] * leak_Na.pace;
 
-    lambda_Cl.rate(rho, tmx, in, out, params);
-    ans -= rho[ iCl ] * lambda_Cl.pace;
+    leak_Cl.rate(rho, tmx, in, out, params);
+    ans -= rho[ iCl ] * leak_Cl.pace;
     
     return ans;
 }
@@ -94,83 +99,88 @@ void  Cell:: SetSteadyStatePotential(double Em)
     zfind<double> solve(0);
     const double pace = solve(F,1.0/factor,factor);
     std::cerr << "increased by " << pace << std::endl;
-    eff["lambda_K"].pace = pace;
+    leak_K.pace = pace;
 }
 
 double Cell:: ComputePassiveZeroKFlux(double pace)
 {
-    eff["lambda_K"].pace = pace;
+    leak_K.pace = pace;
     return ComputePassiveZeroFlux(in[iZeta]);
 }
 
 
 void Cell:: Setup(double Em)
 {
+    ComputeOutsideComposition(0.0);
+    in = inside0;
+    
+    //__________________________________________________________________________
+    //
     // Set potential => Lambda etc
+    //__________________________________________________________________________
     SetSteadyStatePotential(Em);
 
-    effector &NaK       = eff["NaK"];
-    effector &lambda_K  = eff["lambda_K"];
-
-    // compute the real potassium leak
-    lambda_K.rate(rho, tmx, in, out, params);
-    const double lambda_K_steady = rho[iK]*lambda_K.pace;
-    std::cerr << "lambda_K=" << lambda_K_steady << std::endl;
-    if(lambda_K_steady>=0)
+    //__________________________________________________________________________
+    //
+    // compute the steady state K+ leak
+    //__________________________________________________________________________
+    tao::ld(rho,0);
+    leak_K.rate(rho, tmx, in, out, params);
+    const double lambda_K = rho[iK]*leak_K.pace;
+    std::cerr << "lambda_K=" << lambda_K << std::endl;
+    if(lambda_K>=0)
+    {
         throw exception("Invalid Potassium Concentrations or Potential!");
+    }
 
-    // scale NaK pace
-    const double rho_NaK_steady = -lambda_K_steady/2;
-    std::cerr << "rho_NaK=" << rho_NaK_steady << std::endl;
-    NaK.pace = 1.0;
+    //__________________________________________________________________________
+    //
+    // compute scaling for NaK
+    //__________________________________________________________________________
+    const double rho_NaK = -lambda_K;
+    std::cerr << "rho_NaK=" << rho_NaK << std::endl;
+    tao::ld(rho,0);
     NaK.rate(rho, tmx, in, out, params);
-    const double rho_NaK = 0.5*rho[iK];
-    NaK.pace = rho_NaK_steady/rho_NaK;
-    std::cerr << "\tJmax_NaK=" << NaK.pace << std::endl;
+    const double raw_NaK = rho[iK];
+    NaK.pace = rho_NaK/raw_NaK;
 
-    // scale HNE
-    effector &lambda_Na = eff["lambda_Na"];
-    lambda_Na.rate(rho, tmx, in, out, params);
-    const double lambda_Na_steady = rho[iNa]*lambda_Na.pace;
-    std::cerr << "lambda_Na=" << lambda_Na_steady << std::endl;
-    const double rho_NHE_steady = 3*rho_NaK_steady - lambda_Na_steady;
-    if(rho_NHE_steady<=0)
-        throw exception("Invalid Potassium/Sodium or Potential: negative NHE activty");
 
-    std::cerr << "rho_NHE=" << rho_NHE_steady << std::endl;
-    
-    effector &NHE = eff["NHE"];
-    NHE.rate(rho, tmx, in, out, params);
-    const double rho_NHE = rho[iNa];
-    NHE.pace = rho_NHE_steady/rho_NHE;
-
-    std::cerr << "\tJmax_NHE=" << NHE.pace << std::endl;
-
-    // scale AE
-    effector &lambda_Cl = eff["lambda_Cl"];
-    lambda_Cl.rate(rho, tmx, in, out, params);
-    const double rho_AE2_steady = -rho[iCl]*lambda_Cl.pace;
-    std::cerr << "rho_AE2=" << rho_AE2_steady << std::endl;
-    if(rho_AE2_steady<=0)
-        throw exception("Invalid Chloride/Potential: negatice AE2 activity");
-
-    effector &AE2 = eff["AE2"];
+    //__________________________________________________________________________
+    //
+    // compute scaling for AE2/chloride
+    //__________________________________________________________________________
+    tao::ld(rho,0);
+    leak_Cl.rate(rho, tmx, in, out, params);
+    const double lambda_Cl = rho[iCl]*leak_Cl.pace;
+    if(lambda_Cl>=0)
+    {
+        throw exception("Invalid Chloride Leak: check concentration/potential");
+    }
+    const double rho_AE2 = -lambda_Cl;
+    std::cerr << "rho_AE2=" << rho_AE2 << std::endl;
+    tao::ld(rho,0);
     AE2.rate(rho, tmx, in, out, params);
-    const double rho_AE2 = in[iCl];
-    AE2.pace = rho_AE2_steady/rho_AE2;
-    std::cerr << "\tJmax_AE2=" << AE2.pace << std::endl;
+    const double raw_AE2 = rho[iCl];
+    AE2.pace = rho_AE2/raw_AE2;
 
-    rho.make(M,0);
+    //__________________________________________________________________________
+    //
+    // equilibriate for NHE
+    //__________________________________________________________________________
+    const double rho_NHE = rho_AE2;
+    tao::ld(rho,0);
+    NHE.rate(rho, tmx, in, out, params);
+    const double raw_NHE = rho[iNa];
+    NHE.pace = rho_NHE/raw_NHE;
+
+    std::cerr << std::endl;
     eff.rate(rho, tmx, in, out, params);
     std::cerr << "rho=" << std::endl;
-    lib.display(std::cerr, rho) << std::endl;
-    std::cerr << "charge=" << lib.charge(rho) << std::endl;
+    lib.display(std::cerr, rho);
 
     eqs.absorb(tmx, rho, in);
     std::cerr << "rho1=" << std::endl;
-    lib.display(std::cerr, rho) << std::endl;
-
-    std::cerr << "charge=" << lib.charge(rho) << std::endl;
+    lib.display(std::cerr, rho);
 
 }
 

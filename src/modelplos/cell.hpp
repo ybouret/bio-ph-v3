@@ -11,6 +11,14 @@ public:
     const size_t iCl;
     const size_t iH;
 
+    effector &leak_K;
+    effector &leak_Na;
+    effector &leak_Cl;
+
+    effector &NHE;
+    effector &AE2;
+    effector &NaK;
+    
     explicit Cell( lua_State *vm, const double t);
     virtual ~Cell() throw();
 
