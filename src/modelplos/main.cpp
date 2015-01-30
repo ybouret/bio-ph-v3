@@ -2,7 +2,7 @@
 
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/exception.hpp"
-
+#include "yocto/math/kernel/tao.hpp"
 
 
 int main(int argc, char *argv[])
@@ -36,6 +36,11 @@ int main(int argc, char *argv[])
         std::cerr << "Em1=" << zm1 * cell.Z2E*1000.0 << " mV" << std::endl;
 
         cell.Setup(-60.0e-3);
+
+        vector_t Y(cell.nvar,0);
+        tao::set(Y,cell.inside0);
+
+
 
         return 0;
     }

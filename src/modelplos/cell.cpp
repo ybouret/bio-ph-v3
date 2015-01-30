@@ -15,7 +15,8 @@ leak_Na( eff["lambda_Na"] ),
 leak_Cl( eff["lambda_Cl"] ),
 NHE( eff["NHE"] ),
 AE2( eff["AE2"] ),
-NaK( eff["NaK"] )
+NaK( eff["NaK"] ),
+DiffEq(this, &Cell::Rates)
 {
     
 }
@@ -28,10 +29,7 @@ double Cell:: SteadyStateZeta()
     in  = inside0;
     ComputeOutsideComposition(tmx);
 
-    //eff["lambda_K" ].pace = 1;
-    //eff["lambda_Na"].pace = 1;
-    //eff["lambda_Cl"].pace = 1;
-
+    
     const double zeta_step = 0.1;
     double zeta = 0.1;
     numeric<double>::function F(this, & Cell:: ComputePassiveZeroFlux);
@@ -100,6 +98,8 @@ void  Cell:: SetSteadyStatePotential(double Em)
     const double pace = solve(F,1.0/factor,factor);
     std::cerr << "increased by " << pace << std::endl;
     leak_K.pace = pace;
+
+    inside0[iZeta] = in[iZeta];
 }
 
 double Cell:: ComputePassiveZeroKFlux(double pace)
@@ -183,4 +183,53 @@ void Cell:: Setup(double Em)
     lib.display(std::cerr, rho);
 
 }
+
+
+void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
+{
+    assert(Y.size()>=nvar);
+    assert(dYdt.size()>=nvar);
+
+    //assume Y is normalized ?
+
+    //__________________________________________________________________________
+    //
+    // compute outside
+    //__________________________________________________________________________
+    ComputeOutsideComposition(t);
+
+    //__________________________________________________________________________
+    //
+    //fetch data
+    //__________________________________________________________________________
+    //const double zeta    = Y[iZeta];
+    const double volume  = Y[iVolume];
+    const double activeS = Y[iActiveS];
+
+    //__________________________________________________________________________
+    //
+    //evaluate all fluxes
+    //__________________________________________________________________________
+    eff.rate(rho, t, Y, out, params);
+
+    //__________________________________________________________________________
+    //
+    //evaluate concentration changes
+    //__________________________________________________________________________
+    const double ratio = activeS/volume;
+
+    for(size_t i=M;i>0;--i)
+    {
+        dYdt[i] = rho[i] * ratio;
+    }
+
+    //__________________________________________________________________________
+    //
+    //chemical absorption
+    //__________________________________________________________________________
+    eqs.absorb(t, dYdt, Y);
+    
+
+}
+
 

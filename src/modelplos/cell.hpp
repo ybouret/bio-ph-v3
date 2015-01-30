@@ -15,10 +15,12 @@ public:
     effector &leak_Na;
     effector &leak_Cl;
 
-    effector &NHE;
-    effector &AE2;
-    effector &NaK;
+    effector     &NHE;
+    effector     &AE2;
+    effector     &NaK;
+    diff_equation DiffEq;
     
+
     explicit Cell( lua_State *vm, const double t);
     virtual ~Cell() throw();
 
@@ -34,6 +36,8 @@ public:
     //! SetSteady state and all paces
     void Setup(double Em);
 
+
+
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
 
@@ -41,6 +45,9 @@ private:
     double ComputePassiveZeroFlux(double zeta);
     double ComputePassiveZeroKFlux(double pace);
 
+    void   Rates( array<double> &dYdt, double t, const array<double> &Y );
+
+    
 };
 
 #endif

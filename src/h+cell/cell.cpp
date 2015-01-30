@@ -156,6 +156,7 @@ double HCell:: ComputeRestingZeta(const double t)
 
     zfind<double> solve(0);
     zeta = solve(F,-zeta,zeta);
+    inside0[iZeta] = zeta;
     return zeta;
 }
 
