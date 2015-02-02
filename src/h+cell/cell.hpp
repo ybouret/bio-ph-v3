@@ -46,6 +46,7 @@ public:
     double            tmx;         //!< local time
     vector_t          rho;         //!< temporary rates, #M
     const double      Temperature; //!<
+    const double      Cm;          //!< surface capacitance
     const double      E2Z;         //!< F/(RT)
     const double      Z2E;         //!< (RT)/F;
 

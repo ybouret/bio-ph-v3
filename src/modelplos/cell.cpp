@@ -204,6 +204,7 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     //const double zeta    = Y[iZeta];
     const double volume  = Y[iVolume];
     const double activeS = Y[iActiveS];
+    const double surface = Y[iSurface];
 
     //__________________________________________________________________________
     //
@@ -228,7 +229,15 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     //
     // electric equation...
     //__________________________________________________________________________
-    const double dQ = lib.charge(dYdt) * volume;
+
+    //TODO: rewrite with a change of surface
+    const double SI_Volume   = volume  * 1e-18;
+    //const double SI_surface  = surface * 1e-12;
+    const double dQdt        = lib.charge(dYdt) * SI_Volume;
+    const double Capa        = surface * Cm;
+    const double dzeta       = E2Z * dQdt / Capa;
+
+    dYdt[iZeta] = dzeta;
 
     //__________________________________________________________________________
     //
