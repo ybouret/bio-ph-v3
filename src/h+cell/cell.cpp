@@ -186,5 +186,34 @@ double HCell:: ComputeFluxes(double zeta)
     return lib.charge(rho);
 }
 
+void HCell:: add_header( ios::ostream &fp ) const
+{
+    fp << " pH";
+    fp << " Em";
+    fp << " volume";
+    fp << " surface";
+    fp << " activeS";
 
+    for(library::const_iterator i = lib.begin(); i != lib.end(); ++i)
+    {
+        const string &id = (*i)->name;
+        fp << ' ' << id;
+    }
+}
+
+void HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
+{
+    assert(Y.size()>=nvar);
+    fp(" %.15g",lib.pH(Y));
+    fp(" %.15g",Y[iZeta]*Z2E*1000);
+    fp(" %.15g",Y[iVolume]);
+    fp(" %.15g",Y[iSurface]);
+    fp(" %.15g",Y[iActiveS]);
+
+    for(size_t i=1;i<=M;++i)
+    {
+        fp(" %.15g", Y[i]);
+    }
+
+}
 

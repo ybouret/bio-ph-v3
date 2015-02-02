@@ -3,7 +3,7 @@
 
 #include "luavm.hpp"
 #include "yocto/physics/constants.hpp"
-
+#include "yocto/ios/ostream.hpp"
 
 class HCell
 {
@@ -71,6 +71,8 @@ public:
     //! solve the Rates equation from t0 to t1
     void Step(array<double> &Y, double t0, double t1);
 
+    void add_header( ios::ostream &fp ) const;
+    void add_values( ios::ostream &fp, const array<double> &Y ) const;
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);

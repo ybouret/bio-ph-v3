@@ -3,6 +3,7 @@
 #include "yocto/lua/lua-config.hpp"
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/tao.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 
 int main(int argc, char *argv[])
@@ -47,13 +48,26 @@ int main(int argc, char *argv[])
         std::cerr << "Y=" << Y << std::endl;
 
         static const char wheel[] = "|/-\\";
-        size_t count=0;
-        const double dt = 0.01;
-        for(double t=0;t<=10;t+=dt)
+        size_t       count= 0;
+        const double dt   = 0.5;
+
         {
-            std::cerr << '[' << wheel[ count++ % sizeof(wheel) ] << ']' << '\r';
+            ios::ocstream fp("output.dat",false);
+            fp("#t ");
+            cell.add_header(fp);
+            fp("\n");
+        }
+
+        for(double t=0;t<=600;t+=dt)
+        {
+            std::cerr << '[' << wheel[ count++ % sizeof(wheel) ] << ']' << "\tt=" << t << "         " << '\r';
             std::cerr.flush();
             cell.Step(Y,t,t+dt);
+            ios::ocstream fp("output.dat",true);
+            fp("%g",t+dt);
+            cell.add_values(fp,Y);
+            fp("\n");
+
         }
         std::cerr << std::endl;
 
