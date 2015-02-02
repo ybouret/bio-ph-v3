@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
             fp("\n");
         }
 
-        for(double t=0;t<=600;t+=dt)
+        for(double t=0;t<=900;t+=dt)
         {
             std::cerr << '[' << wheel[ count++ % sizeof(wheel) ] << ']' << "\tt=" << t << "         " << '\r';
             std::cerr.flush();
@@ -70,6 +70,8 @@ int main(int argc, char *argv[])
 
         }
         std::cerr << std::endl;
+
+        std::cerr << "#calls=" << cell.ncalls << std::endl;
 
         return 0;
     }

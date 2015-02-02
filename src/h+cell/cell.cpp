@@ -43,7 +43,8 @@ E2Z(Y_FARADAY/(Y_R*Temperature)),
 Z2E((Y_R*Temperature)/Y_FARADAY),
 odeint( Lua::Config::Get<lua_Number>(L,"ftol")   ),
 diff_h( Lua::Config::Get<lua_Number>(L,"diff_h") ),
-diffeq( this, & HCell::Call )
+diffeq( this, & HCell::Call ),
+ncalls(0)
 {
     std::cerr << lib << std::endl;
     std::cerr << eqs << std::endl;
@@ -138,6 +139,7 @@ void HCell:: ComputeOutsideComposition(const double t)
 
 void HCell:: Call(array<double> &dYdt, double t, const array<double> &Y)
 {
+    ++ncalls;
     Rates(dYdt,t,Y);
 }
 

@@ -52,6 +52,7 @@ public:
     diff_solver   odeint; //!< solver, initialized for nvar
     const double  diff_h; //!< initial time step for each dt
     diff_equation diffeq; //!< use Call, calling virtual Rates...
+    size_t        ncalls; //!< internal counter
 
     //! using outside solutions...
     /**
