@@ -45,9 +45,17 @@ int main(int argc, char *argv[])
         std::cerr << "activeS=" << Y[cell.iActiveS] << std::endl;
 
         std::cerr << "Y=" << Y << std::endl;
-        cell.Step(Y,0,1);
-        
 
+        static const char wheel[] = "|/-\\";
+        size_t count=0;
+        const double dt = 0.01;
+        for(double t=0;t<=10;t+=dt)
+        {
+            std::cerr << '[' << wheel[ count++ % sizeof(wheel) ] << ']' << '\r';
+            std::cerr.flush();
+            cell.Step(Y,t,t+dt);
+        }
+        std::cerr << std::endl;
 
         return 0;
     }

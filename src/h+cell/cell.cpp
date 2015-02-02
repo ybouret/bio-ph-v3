@@ -131,9 +131,9 @@ void HCell:: ComputeOutsideComposition(const double t)
         weights[i] = lua_tonumber(L, -1);
         lua_pop(L,1);
     }
-    std::cerr << "weights=" << weights << std::endl;
+    //std::cerr << "weights=" << weights << std::endl;
     eqs.mix(out, outside, weights, t);
-    std::cerr << "out=" << out << std::endl;
+    //std::cerr << "out=" << out << std::endl;
 }
 
 void HCell:: Call(array<double> &dYdt, double t, const array<double> &Y)
