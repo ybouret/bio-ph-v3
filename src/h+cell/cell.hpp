@@ -33,8 +33,8 @@ public:
     const size_t      M;           //!< #species
     parameters        params;      //!< extra parameters
     const size_t      iZeta;       //!< zeta index
-    const size_t      iVolume;     //!< volume index
-    const size_t      iSurface;    //!< surface index
+    const size_t      iVolume;     //!< volume index, volume inmu^3
+    const size_t      iSurface;    //!< surface index, surface in mu^2
     const size_t      iActiveS;    //!< active surface, initially surface
     const size_t      nvar;        //!< #nvar for all
     __lua::Effectors  eff;         //!< effectors
@@ -46,7 +46,7 @@ public:
     double            tmx;         //!< local time
     vector_t          rho;         //!< temporary rates, #M
     const double      Temperature; //!<
-    const double      Cm;          //!< surface capacitance
+    const double      Cm;          //!< surface capacitance, in F/mu^2
     const double      E2Z;         //!< F/(RT)
     const double      Z2E;         //!< (RT)/F;
 
