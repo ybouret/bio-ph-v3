@@ -165,7 +165,6 @@ double HCell:: ComputeRestingZeta(const double t)
     {
         const double Fm = F(-zeta);
         const double Fp = F( zeta);
-        //std::cerr << "zeta=" << zeta << ", Em=" << Z2E * zeta << ", Fm=" << Fm << ", Fp=" << Fp << std::endl;
         if(Fm*Fp<0)
         {
             break;
@@ -196,6 +195,7 @@ void HCell:: add_header( ios::ostream &fp ) const
     fp << " volume";
     fp << " surface";
     fp << " activeS";
+    fp << " deltaOsm";
 
     for(library::const_iterator i = lib.begin(); i != lib.end(); ++i)
     {
@@ -212,7 +212,7 @@ void HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
     fp(" %.15g",Y[iVolume]);
     fp(" %.15g",Y[iSurface]);
     fp(" %.15g",Y[iActiveS]);
-
+    fp(" %.15g",lib.osmolarity(Y)-lib.osmolarity(out));
     for(size_t i=1;i<=M;++i)
     {
         fp(" %.15g", Y[i]);

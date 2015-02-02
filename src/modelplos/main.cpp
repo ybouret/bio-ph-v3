@@ -47,6 +47,9 @@ int main(int argc, char *argv[])
 
         std::cerr << "Y=" << Y << std::endl;
 
+        std::cerr << "OsmIn ="  << cell.lib.osmolarity(Y)        << std::endl;
+        std::cerr << "OsmOut=" << cell.lib.osmolarity(cell.out) << std::endl;
+
         static const char wheel[] = "|/-\\";
         size_t       count= 0;
         const double dt   = 0.5;
@@ -58,7 +61,7 @@ int main(int argc, char *argv[])
             fp("\n");
         }
 
-        for(double t=0;t<=900;t+=dt)
+        for(double t=0;t<=1800;t+=dt)
         {
             std::cerr << '[' << wheel[ count++ % sizeof(wheel) ] << ']' << "\tt=" << t << "         " << '\r';
             std::cerr.flush();
