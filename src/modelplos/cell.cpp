@@ -218,7 +218,7 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     // Model: S=S0*(V/V0)^(2/3)
     const double Sdot = (2.0*S0*pow(1.0/(volume*V0*V0),1.0/3)*Vdot)/3.0;
     dYdt[iSurface] = Sdot;
-
+    //dYdt[iSurface] = 0;
 
     //__________________________________________________________________________
     //
