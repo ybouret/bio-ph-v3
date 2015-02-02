@@ -49,8 +49,9 @@ public:
     const double      E2Z;         //!< F/(RT)
     const double      Z2E;         //!< (RT)/F;
 
-    diff_solver   odeint;
+    diff_solver   odeint; //!< solver, initialized for nvar
     const double  diff_h; //!< initial time step for each dt
+    diff_equation diffeq; //!< use Call, calling virtual Rates...
 
     //! using outside solutions...
     /**
@@ -64,6 +65,12 @@ public:
      */
     double ComputeRestingZeta(const double t);
 
+    //! to be implemented
+    virtual void   Rates( array<double> &dYdt, double t, const array<double> &Y ) = 0;
+
+    //! solve the Rates equation from t0 to t1
+    void Step(array<double> &Y, double t0, double t1);
+
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);
@@ -72,7 +79,7 @@ private:
      \return the algebraic signed flux
      */
     double ComputeFluxes(double zeta);
-
+    void   Call( array<double> &dYdt, double t, const array<double> &Y );
 
 };
 

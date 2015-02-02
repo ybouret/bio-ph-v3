@@ -42,7 +42,8 @@ Temperature(298),
 E2Z(Y_FARADAY/(Y_R*Temperature)),
 Z2E((Y_R*Temperature)/Y_FARADAY),
 odeint( Lua::Config::Get<lua_Number>(L,"ftol")   ),
-diff_h( Lua::Config::Get<lua_Number>(L,"diff_h") )
+diff_h( Lua::Config::Get<lua_Number>(L,"diff_h") ),
+diffeq( this, & HCell::Call )
 {
     std::cerr << lib << std::endl;
     std::cerr << eqs << std::endl;
@@ -134,6 +135,18 @@ void HCell:: ComputeOutsideComposition(const double t)
     eqs.mix(out, outside, weights, t);
     std::cerr << "out=" << out << std::endl;
 }
+
+void HCell:: Call(array<double> &dYdt, double t, const array<double> &Y)
+{
+    Rates(dYdt,t,Y);
+}
+
+void HCell:: Step(array<double> &Y, double t0, double t1)
+{
+    double hh = diff_h;
+    odeint(diffeq,Y,t0,t1,hh,&eqs.callback);
+}
+
 
 const double HCell:: ZETA_MAX = 5.0;
 

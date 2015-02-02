@@ -16,10 +16,8 @@ leak_Na( eff["lambda_Na"] ),
 leak_Cl( eff["lambda_Cl"] ),
 NHE( eff["NHE"] ),
 AE2( eff["AE2"] ),
-NaK( eff["NaK"] ),
-diffeq(this, &Cell::Rates)
+NaK( eff["NaK"] )
 {
-    //odeint.start(nvar);
 }
 
 #include "yocto/math/fcn/zfind.hpp"
@@ -240,9 +238,4 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
 }
 
 
-void Cell:: Step(array<double> &Y, double t0, double t1)
-{
-    double hh = diff_h;
-    odeint(diffeq,Y,t0,t1,hh,&eqs.callback);
-}
 
