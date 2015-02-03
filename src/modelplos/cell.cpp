@@ -222,7 +222,8 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     const double V0 = inside[iVolume];
 
     // Let us compute the Vdot
-    const double Vdot = 100.0 * deltaOsm;
+    //const double Vdot = 100.0 * deltaOsm;
+    const double Vdot = 0;
     dYdt[iVolume] = Vdot;
 
     // Model: S=S0*(V/V0)^(2/3)

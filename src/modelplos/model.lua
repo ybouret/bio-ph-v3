@@ -8,7 +8,7 @@ diff_h = 1e-5; -- initial adaptive time step between to time steps
 
 dt      = 0.1;
 dt_save = 1;
-t_run   = 8000;
+t_run   = 30*60;
 
 
 -- -----------------------------------------------------------------------------
@@ -53,10 +53,10 @@ pKY = 6.2;
 
 function P_CO2(t)
 local  P0    = 40.0;
---local  W     = 10;
---if (t>=0) and (t<=W*math.pi) then
---  return P0/760.0 + (40.0/760.0) * math.sin(t/W)^2;
---end
+local  W     = 10;
+if (t>=0) and (t<=W*math.pi) then
+  return P0/760.0 + (40.0/760.0) * math.sin(t/W)^2;
+end
 return P0/760;
 end
 
@@ -121,7 +121,7 @@ init0 =
     { 4e-3,         { 1, "K+"  } },
     { 140e-3,       { 1, "Na+" } },
     { 100e-3,       { 1, "Cl-" } },
-    { "osmolarity", 301e-3 },
+    { "osmolarity", 300e-3 },
     { 0, { 1, "HY"}, {1, "Y-" } }
 }
 
@@ -131,7 +131,7 @@ init1 =
     { 4e-3,         { 1, "K+"  } },
     { 140e-3,       { 1, "Na+" } },
     { 100e-3,       { 1, "Cl-" } },
-    { "osmolarity",  500e-3 },
+    { "osmolarity",  300e-3 },
     { 0, { 1, "HY"}, {1, "Y-" } }
 }
 
@@ -144,9 +144,9 @@ out =
 
 
 function weights(t)
-local  w = exp(-t);
+--local  w = exp(-t);
 --return w,1-w;
-return 1,0;
+return 1,0
 end
 
 -- -----------------------------------------------------------------------------
@@ -211,42 +211,43 @@ c = 5;
 surface = EllipsoidSurface(a,b,c);
 volume  = EllipsoidVolume(a,b,c);
 
+perm_ratio = 1.0/Surf_exp;
 
 -- -----------------------------------------------------------------------------
--- INWARD Na moles/s
+-- INWARD Na moles/s/mu^2
 -- -----------------------------------------------------------------------------
 function lambda_Na(t,Cin,Cout,params)
 local zeta = params["zeta"];
 local zz   = zeta;
 local Na = "Na+";
 a = {};
-local rho = Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta)/Surf_exp;
+local rho = Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta)*perm_ratio;
 a[Na] = rho;
 return a;
 end
 
 -- -----------------------------------------------------------------------------
--- INWARD potassium moles/s
+-- INWARD potassium moles/s/mu^2
 -- -----------------------------------------------------------------------------
 function lambda_K(t,Cin,Cout,params)
 local zeta = params["zeta"];
 local zz   = zeta;
 local K  = "K+";
 a = {};
-local rho = Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta)/Surf_exp;
+local rho = Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta)*perm_ratio;
 a[K] = rho;
 return a;
 end
 
 -- -----------------------------------------------------------------------------
--- INWARD chloride moles/s
+-- INWARD chloride moles/s/mu^2
 -- -----------------------------------------------------------------------------
 function lambda_Cl(t,Cin,Cout,params)
 local zeta = params["zeta"];
 local zz   = -zeta;
 local Cl = "Cl-";
 a = {};
-local rho = Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta)/Surf_exp;
+local rho = Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta)*perm_ratio;
 a[Cl] = rho;
 return a;
 end
