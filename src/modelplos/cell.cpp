@@ -183,6 +183,7 @@ void Cell:: Setup(double Em)
 
 }
 
+#include "yocto/sort/quick.hpp"
 
 void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
 {
@@ -196,8 +197,17 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     // compute outside
     //__________________________________________________________________________
     ComputeOutsideComposition(t);
-
-    const double deltaOsm = lib.osmolarity(Y) - lib.osmolarity(out);
+    rho.make(M,0);
+    for(size_t i=M;i>0;--i)
+    {
+        rho[i] = Y[i] - out[i];
+    }
+    quicksort(rho);
+    double deltaOsm = 0;
+    for(size_t i=1;i<=M;++i)
+    {
+        deltaOsm += rho[i];
+    }
 
     //__________________________________________________________________________
     //
