@@ -8,7 +8,7 @@ diff_h = 1e-5; -- initial adaptive time step between to time steps
 
 dt      = 0.1;
 dt_save = 0.2;
-t_run   = 5*60;
+t_run   = 15*60;
 
 
 -- -----------------------------------------------------------------------------
@@ -53,9 +53,9 @@ pKY = 6.2;
 
 function P_CO2(t)
 local  P0    = 40.0;
-local  W     = 10;
-if (t>=0) and (t<=W*math.pi) then
-  return P0/760.0 + (40.0/760.0) * math.sin(t/W)^2;
+local  W     = 60;
+if (t>=5) and (t<=W*math.pi+5) then
+  return P0/760.0 + (40.0/760.0) * math.sin((t-5)/W)^2;
 end
 return P0/760;
 end
@@ -88,7 +88,7 @@ eff =
     "NaK",
     "NHE",
     "AE2"
-    --"inject"
+    -- , "inject"
 };
 
 

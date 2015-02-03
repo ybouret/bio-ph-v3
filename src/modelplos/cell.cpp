@@ -174,6 +174,10 @@ void Cell:: Setup(double Em)
 
     std::cerr << std::endl;
     eff.rate(rho, tmx, in, out, params);
+    for(size_t i=M;i>0;--i)
+    {
+        rho[i] *= inside[iActiveS]/(1e-15*inside[iVolume]);
+    }
     std::cerr << "rho=" << std::endl;
     lib.display(std::cerr, rho) << std::endl;;
 
