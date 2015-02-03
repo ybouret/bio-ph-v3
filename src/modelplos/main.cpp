@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
         std::cerr << "Em1=" << zm1 * cell.Z2E*1000.0 << " mV" << std::endl;
 
         cell.Setup(-60.0e-3);
+        cell.eff.rescale_pace(50);
 
         //----------------------------------------------------------------------
         //
