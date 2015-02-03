@@ -6,6 +6,10 @@
 ftol   = 1e-4; -- differential fractional tolerance
 diff_h = 1e-5; -- initial adaptive time step between to time steps
 
+dt      = 0.1;
+dt_save = 1;
+t_run   = 100;
+
 
 -- -----------------------------------------------------------------------------
 --

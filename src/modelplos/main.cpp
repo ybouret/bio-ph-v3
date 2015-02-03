@@ -4,7 +4,7 @@
 #include "yocto/exception.hpp"
 #include "yocto/math/kernel/tao.hpp"
 #include "yocto/ios/ocstream.hpp"
-
+#include "yocto/math/round.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -26,8 +26,11 @@ int main(int argc, char *argv[])
             Lua::Config::DoString(L, argv[i]);
         }
 
-
-
+        //----------------------------------------------------------------------
+        //
+        // setting up the cell
+        //
+        //----------------------------------------------------------------------
         Cell cell(L,0.0);
         const double zm0 = cell.SteadyStateZeta();
         std::cerr << "Zm0=" << zm0 << std::endl;
@@ -38,6 +41,11 @@ int main(int argc, char *argv[])
 
         cell.Setup(-60.0e-3);
 
+        //----------------------------------------------------------------------
+        //
+        // phase space
+        //
+        //----------------------------------------------------------------------
         vector_t Y(cell.nvar,0);
         tao::set(Y,cell.inside);
         std::cerr << "zeta   =" << Y[cell.iZeta]    << ", Em=" << Y[cell.iZeta]*cell.Z2E*1000.0 << std::endl;
@@ -50,26 +58,48 @@ int main(int argc, char *argv[])
         std::cerr << "OsmIn ="  << cell.lib.osmolarity(Y)        << std::endl;
         std::cerr << "OsmOut=" << cell.lib.osmolarity(cell.out) << std::endl;
 
+        //----------------------------------------------------------------------
+        //
+        // timings
+        //
+        //----------------------------------------------------------------------
+        double       dt      = Lua::Config::Get<lua_Number>(L,"dt");
+        const double t_run   = Lua::Config::Get<lua_Number>(L,"t_run");
+        double       dt_save = Lua::Config::Get<lua_Number>(L,"dt_save");
+        const size_t every   = simulation_save_every(dt, dt_save);
+        const size_t niter   = simulation_iter(t_run, dt, every);
+
+        std::cerr << "dt=" << dt << std::endl;
+        std::cerr << "savering every " << every << std::endl;
+        std::cerr << "t_run=" << t_run << std::endl;
+        std::cerr << "niter=" << niter << std::endl;
+
         static const char wheel[] = "|/-\\";
-        size_t       count= 0;
-        const double dt   = 0.5;
 
         {
             ios::ocstream fp("output.dat",false);
             fp("#t ");
             cell.add_header(fp);
             fp("\n");
+            fp("0 ");
+            cell.add_values(fp, Y);
+            fp("\n");
         }
 
-        for(double t=0;t<=3600;t+=dt)
+        for(size_t i=1;i<=niter;++i)
         {
-            std::cerr << '[' << wheel[ count++ % sizeof(wheel) ] << ']' << "\tt=" << t << "         " << '\r';
+            const double t0 = (i-1)*dt;
+            const double t  =  i   *dt;
             std::cerr.flush();
-            cell.Step(Y,t,t+dt);
-            ios::ocstream fp("output.dat",true);
-            fp("%g",t+dt);
-            cell.add_values(fp,Y);
-            fp("\n");
+            cell.Step(Y,t0,t);
+            if(0==(i%every))
+            {
+                std::cerr << '[' << wheel[ i % (sizeof(wheel)-1) ] << ']' << "\tt=" << t << "         " << '\r';
+                ios::ocstream fp("output.dat",true);
+                fp("%g",t);
+                cell.add_values(fp,Y);
+                fp("\n");
+            }
 
         }
         std::cerr << std::endl;
