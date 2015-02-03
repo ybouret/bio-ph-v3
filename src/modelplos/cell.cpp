@@ -215,6 +215,7 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     //__________________________________________________________________________
     //const double zeta    = Y[iZeta];
     const double volume  = Y[iVolume];
+    const double litres  = volume * 1e-15;
     const double activeS = Y[iActiveS];
     const double surface = Y[iSurface];
 
@@ -233,7 +234,7 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
 
     //__________________________________________________________________________
     //
-    //evaluate all surface fluxes
+    //evaluate all surface fluxes in moles/s/micron^2
     //__________________________________________________________________________
     eff.rate(rho, t, Y, out, params);
 
@@ -241,14 +242,15 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
 
     //__________________________________________________________________________
     //
-    //evaluate concentration changes per unit of time
+    //evaluate concentration changes per unit of time, moles/L
     //__________________________________________________________________________
-    const double ratio = activeS/volume;
+    const double ratio = activeS/litres;
     const double dlnV  = Vdot/volume;
     for(size_t i=M;i>0;--i)
     {
         dYdt[i] = rho[i] * ratio - Y[i] * dlnV;
     }
+
 
     //__________________________________________________________________________
     //
@@ -256,8 +258,7 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     //__________________________________________________________________________
 
     //TODO: rewrite with a change of surface
-    const double SI_Volume   = volume  * 1e-18;
-    const double dQdt        = lib.charge(dYdt) * SI_Volume;
+    const double dQdt        = Y_FARADAY * lib.charge(dYdt) * litres;
     const double Capa        = surface * Cm;
     const double dzeta       = E2Z * dQdt / Capa;
 

@@ -7,8 +7,8 @@ ftol   = 1e-4; -- differential fractional tolerance
 diff_h = 1e-5; -- initial adaptive time step between to time steps
 
 dt      = 0.1;
-dt_save = 1;
-t_run   = 30*60;
+dt_save = 0.2;
+t_run   = 5*60;
 
 
 -- -----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ c = 5;
 surface = EllipsoidSurface(a,b,c);
 volume  = EllipsoidVolume(a,b,c);
 
-perm_ratio = 1.0/Surf_exp;
+perm_ratio = 1.0e-15/Surf_exp;
 
 -- -----------------------------------------------------------------------------
 -- INWARD Na moles/s/mu^2
@@ -221,7 +221,7 @@ local zeta = params["zeta"];
 local zz   = zeta;
 local Na = "Na+";
 a = {};
-local rho = Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta)*perm_ratio;
+local rho =  Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta)*perm_ratio;
 a[Na] = rho;
 return a;
 end
@@ -234,7 +234,7 @@ local zeta = params["zeta"];
 local zz   = zeta;
 local K  = "K+";
 a = {};
-local rho = Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta)*perm_ratio;
+local rho =  Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta)*perm_ratio;
 a[K] = rho;
 return a;
 end
@@ -247,13 +247,13 @@ local zeta = params["zeta"];
 local zz   = -zeta;
 local Cl = "Cl-";
 a = {};
-local rho = Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta)*perm_ratio;
+local rho =  Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta)*perm_ratio;
 a[Cl] = rho;
 return a;
 end
 
 -- -----------------------------------------------------------------------------
--- NaK/ATPase INWARD moles/s
+-- NaK/ATPase INWARD moles/s, unscaled
 -- -----------------------------------------------------------------------------
 K_NaK = 12e-3;
 
@@ -269,7 +269,7 @@ return a;
 end
 
 -- -----------------------------------------------------------------------------
--- NHE INWARD moles/s
+-- NHE INWARD moles/s, unscaled
 -- -----------------------------------------------------------------------------
 
 L0    = 1000;
