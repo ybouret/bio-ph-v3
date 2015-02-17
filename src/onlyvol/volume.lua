@@ -13,7 +13,8 @@ t_run   = 15*60;
 lib =
 {
     {"H+",1},
-    {"HO-",-1}
+    {"HO-",-1},
+    {"OSM",0}
 };
 
 eqs =
@@ -30,12 +31,14 @@ eff =
 
 ini =
 {
-    { "E/N" }
+    { "E/N" },
+    { "osmolarity", 300e-3 }
 };
 
 out0 =
 {
-    { "E/N" }
+    { "E/N" },
+    { "osmolarity", 300e-3}
 };
 
 out =
