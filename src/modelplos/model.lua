@@ -204,9 +204,9 @@ Surf_exp = Capa_exp / Cm; -- in micron^2
 -- -----------------------------------------------------------------------------
 
 
-a = 12.5;
-b = 5;
-c = 5;
+a = 12.5; -- in microns
+b = 5;    -- in microns
+c = 5;    -- in microns
 
 surface = EllipsoidSurface(a,b,c);
 volume  = EllipsoidVolume(a,b,c);
