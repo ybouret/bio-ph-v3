@@ -21,6 +21,7 @@ params(lib,fill_params_reg(extra_params_reg, extra_params_num) ),
 nvar(params.nvar),
 eff(vm,"eff"),
 inside(nvar,0.0),
+tmx(t0),
 in(nvar,0),
 outside(),
 out(M,0.0),
@@ -74,7 +75,12 @@ weights()
         inside[j] = Lua::Config::Get<lua_Number>(L,p);
     }
 
+    //__________________________________________________________________________
+    //
+    // initializing
+    //__________________________________________________________________________
     in = inside;
+    
 }
 
 const array<string> &HCell:: fill_params_reg(const char **extra_params_reg,

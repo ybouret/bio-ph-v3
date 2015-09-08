@@ -8,7 +8,7 @@ diff_h = 1e-5; -- initial adaptive time step between to time steps
 
 dt      = 0.1;
 dt_save = 0.2;
-t_run   = 15*60;
+t_run   = 60+600+600;
 
 
 -- -----------------------------------------------------------------------------
@@ -53,10 +53,10 @@ pKY = 6.2;
 
 function P_CO2(t)
 local  P0    = 40.0;
-local  W     = 60;
-if (t>=5) and (t<=W*math.pi+5) then
-  return P0/760.0 + (40.0/760.0) * math.sin((t-5)/W)^2;
-end
+--local  W     = 60;
+--if (t>=5) and (t<=W*math.pi+5) then
+--  return P0/760.0 + (40.0/760.0) * math.sin((t-5)/W)^2;
+--end
 return P0/760;
 end
 
@@ -146,6 +146,12 @@ out =
 function weights(t)
 --local  w = exp(-t);
 --return w,1-w;
+if (t<=60) then
+return 1,0
+end
+if(t<=60+600)then
+return 0,1
+end
 return 1,0
 end
 

@@ -39,6 +39,7 @@ public:
     const size_t      &nvar;        //!< params.size
     __lua::Effectors   eff;         //!< effectors
     vector_t           inside;      //!< initial inside concentration (+extra vars)
+    double             tmx;         //!< current time
     vector_t           in;          //!< current inside
     matrix_t           outside;     //!< possible outside solutions
     vector_t           out;         //!< resulting from mix, using the lua "weights" function
