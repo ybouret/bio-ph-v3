@@ -1,5 +1,6 @@
 #include "hcell.hpp"
 #include "yocto/exception.hpp"
+#include "yocto/lua/lua-config.hpp"
 
 const char * HCell:: PARAMS_REG[] = { "zeta", "V", "S" };
 const size_t HCell:: PARAMS_NUM   = sizeof(HCell::PARAMS_REG)/sizeof(HCell::PARAMS_REG[0]);
@@ -17,7 +18,7 @@ N(eqs.N),
 M(eqs.M),
 params_reg(),
 params(lib,fill_params_reg(extra_params_reg, extra_params_num) ),
-nvar(params.count),
+nvar(params.nvar),
 eff(vm,"eff"),
 inside(nvar,0.0),
 in(nvar,0),
@@ -67,7 +68,10 @@ weights()
     //__________________________________________________________________________
     for(parameters::iterator i=params.begin(); i != params.end(); ++i)
     {
-
+        const string &p = i->key;
+        const size_t  j = *i;
+        std::cerr << "-- loading '" << p << "' @" << j << std::endl;
+        inside[j] = Lua::Config::Get<lua_Number>(L,p);
     }
 
     in = inside;
@@ -92,6 +96,6 @@ const array<string> &HCell:: fill_params_reg(const char **extra_params_reg,
         const string p(extra_params_reg[i]);
         params_reg.push_back(p);
     }
-    
+
     return params_reg;
 }
