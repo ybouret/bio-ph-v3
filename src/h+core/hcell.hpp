@@ -50,9 +50,13 @@ public:
     const size_t      &M;           //!< #species
     variables          params;      //!< extra parameters, initially 0
     const size_t      &nvar;        //!< params.size
+    const size_t       iZeta;       //!<
+    const size_t       iVolume;     //!<
+    const size_t       iSurface;    //!< 
     __lua::Effectors   eff;         //!< effectors
     vector_t           inside;      //!< initial inside concentration (+extra vars)
     double             tmx;         //!< current time
+    vector_t           rho;         //!< temporary rates, #M
     vector_t           in;          //!< current inside
     matrix_t           outside;     //!< possible outside solutions
     vector_t           out;         //!< resulting from mix, using the lua "weights" function
@@ -75,7 +79,28 @@ public:
     const double  diff_h; //!< initial time step for each dt
     diff_equation diffeq; //!< use Call, calling virtual Rates...
     size_t        ncalls; //!< internal counter
-    
+
+    //__________________________________________________________________________
+    //
+    // control functions
+    //__________________________________________________________________________
+
+    //! using outside solutions...
+    /**
+     The result is set in out
+     */
+    void   ComputeOutsideComposition(const double t);
+
+
+    //! compute individual fluxes from effectors
+    /**
+     assuming out is computed, and using in
+     \return the algebraic signed flux, moles/s/mu^2
+     */
+    double ComputeFluxes(double zeta);
+
+    virtual void Rates( array<double> &dYdt, double t, const array<double> &Y ) = 0;
+
 
     //__________________________________________________________________________
     //

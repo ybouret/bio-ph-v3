@@ -21,12 +21,15 @@ lib(vm,"lib"),
 eqs(vm,"eqs",lib),
 N(eqs.N),
 M(eqs.M),
-//params_reg(),
 params(lib, PARAMS_NAMES_REG, PARAMS_LOADS_REG, PARAMS_EXTRA_NUM),
 nvar(params.count),
+iZeta(params["zeta"]),
+iVolume(params["V"]),
+iSurface(params["S"]),
 eff(vm,"eff"),
 inside(nvar,0.0),
 tmx(t0),
+rho(M,0.0),
 in(nvar,0),
 outside(),
 out(M,0.0),
@@ -88,6 +91,11 @@ ncalls(0)
     
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//...
+//
+////////////////////////////////////////////////////////////////////////////////
 void HCell:: Call( array<double> &dYdt, double t, const array<double> &Y )
 {
     ++ncalls;
@@ -119,7 +127,49 @@ const array<string> &HCell:: fill_params_reg(const char **extra_params_reg,
 }
 #endif
 
+////////////////////////////////////////////////////////////////////////////////
+//
+//...
+//
+////////////////////////////////////////////////////////////////////////////////
 
+void HCell:: ComputeOutsideComposition(const double t)
+{
+    const size_t ns = outside.rows; assert(ns>0);
+    weights.make(ns,0.0);
+    lua_settop(L,0);
+    lua_getglobal(L, "weights");
+
+    //-- push time
+    lua_pushnumber(L,t);
+
+    //-- call function
+    if( lua_pcall(L, 1, ns, 0))
+    {
+        const char *err = lua_tostring(L, -1);
+        throw exception("weights(%g): %s",t,err);
+    }
+
+    //-- get weights
+    for(size_t i=ns;i>0;--i)
+    {
+        if( !lua_isnumber(L, -1))
+        {
+            throw exception("invalid weight #%u", unsigned(i));
+        }
+        weights[i] = lua_tonumber(L, -1);
+        lua_pop(L,1);
+    }
+    //std::cerr << "weights=" << weights << std::endl;
+    eqs.mix(out, outside, weights, t);
+    //std::cerr << "out=" << out << std::endl;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//...
+//
+////////////////////////////////////////////////////////////////////////////////
 void HCell:: add_header( ios::ostream &fp ) const
 {
     fp << " pH";
@@ -139,14 +189,26 @@ void HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
 {
     assert(Y.size()>=nvar);
     fp(" %.15g",lib.pH(Y));
-    fp(" %.15g",Y[M+1]*Z2E);
-    fp(" %.15g",Y[M+2]);
-    fp(" %.15g",Y[M+3]);
+    fp(" %.15g",Y[iZeta]*Z2E);
+    fp(" %.15g",Y[iVolume]);
+    fp(" %.15g",Y[iSurface]);
     fp(" %.15g",lib.osmolarity(Y)-lib.osmolarity(out));
     for(size_t i=1;i<=M;++i)
     {
         fp(" %.15g", Y[i]);
     }
     
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//...
+//
+////////////////////////////////////////////////////////////////////////////////
+double HCell:: ComputeFluxes(double zeta)
+{
+    in[iZeta] = zeta;
+    eff.rate(rho, tmx, in, out, params);
+    return lib.charge(rho);
 }
 
