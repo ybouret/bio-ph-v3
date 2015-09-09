@@ -7,6 +7,12 @@
 #include "yocto/memory/pooled.hpp"
 
 //! prototype minimal cell
+/**
+ - concentrations: mol/L
+ - volume:         mu^3
+ - surface:        mu^2
+ - potential:      mV
+ */
 class HCell
 {
 public:
@@ -35,7 +41,7 @@ public:
     const size_t      &N;           //!< #eqs
     const size_t      &M;           //!< #species
     vector_s           params_reg;  //!< all the species
-    parameters         params;      //!< extra parameters
+    parameters         params;      //!< extra parameters, initially 0
     const size_t      &nvar;        //!< params.size
     __lua::Effectors   eff;         //!< effectors
     vector_t           inside;      //!< initial inside concentration (+extra vars)
@@ -44,7 +50,9 @@ public:
     matrix_t           outside;     //!< possible outside solutions
     vector_t           out;         //!< resulting from mix, using the lua "weights" function
     vector_t           weights;     //!< to store weights
-
+    const double       T;           //!< temperature
+    const double       E2Z;         //!< zeta = E2Z * Em, E2Z=F/(1000*R*T)
+    const double       Z2E;         //!< Em/mV = Z2E * zeta
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);

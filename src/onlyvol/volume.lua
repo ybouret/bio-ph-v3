@@ -50,9 +50,10 @@ function weights(t)
 return 1;
 end
 
-V =1;
-S =1;
-zeta   =0;
+T       = 298;
+volume  = 1;
+surface = 1;
+Em      = 0;
 
 -- -----------------------------------------------------------------------------
 -- Common surface capacitance

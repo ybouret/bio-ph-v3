@@ -25,7 +25,10 @@ tmx(t0),
 in(nvar,0),
 outside(),
 out(M,0.0),
-weights()
+weights(),
+T( Lua::Config::Get<lua_Number>(L,"T" ) ),
+E2Z( Y_FARADAY / (1000.0*Y_R*T) ),
+Z2E(1.0/E2Z)
 {
 
     params_reg.release();
@@ -63,21 +66,10 @@ weights()
     }
 
 
-    //__________________________________________________________________________
-    //
-    // loading other parameters
-    //__________________________________________________________________________
-    for(parameters::iterator i=params.begin(); i != params.end(); ++i)
-    {
-        const string &p = i->key;
-        const size_t  j = *i;
-        std::cerr << "-- loading '" << p << "' @" << j << std::endl;
-        inside[j] = Lua::Config::Get<lua_Number>(L,p);
-    }
 
     //__________________________________________________________________________
     //
-    // initializing
+    // end initializing
     //__________________________________________________________________________
     in = inside;
     
