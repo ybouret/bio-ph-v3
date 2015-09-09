@@ -62,9 +62,9 @@ ncalls(0)
         eqs.create(inside, ini, t0);
     }
     __lua::load(L,inside,params);
-    std::cerr << "inside=" << std::endl;
     lib.display(std::cerr,inside) << std::endl;
-
+    std::cerr << "inside=" << inside << std::endl;
+    
     //__________________________________________________________________________
     //
     // Loading Outside possible solutions
@@ -88,7 +88,7 @@ ncalls(0)
     // end initializing
     //__________________________________________________________________________
     in = inside;
-    
+    std::cerr << "in=" << inside << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -208,6 +208,7 @@ void HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
 double HCell:: ComputeFluxes(double zeta)
 {
     in[iZeta] = zeta;
+    std::cerr << "in=" << in << std::endl;
     eff.rate(rho, tmx, in, out, params);
     return lib.charge(rho);
 }
