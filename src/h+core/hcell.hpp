@@ -8,10 +8,11 @@
 
 //! prototype minimal cell
 /**
- - concentrations: mol/L
- - volume:         mu^3
- - surface:        mu^2
- - potential:      mV
+ - concentrations:      mol/L
+ - volume:              mu^3 = 1e-18 m^2 = 1e-15 L
+ - surface:             mu^2
+ - potential:           mV
+ - surface capacitance: muF/cm^2, 1e-14 F/mu^2
  */
 class HCell
 {
@@ -36,6 +37,11 @@ public:
     virtual ~HCell() throw();
 
     lua_State         *L;           //!< internal virtual machine
+
+    //__________________________________________________________________________
+    //
+    // Chemical Part
+    //__________________________________________________________________________
     __lua::Library     lib;         //!< the library
     __lua::Equilibria  eqs;         //!< the global chemical system
     const size_t      &N;           //!< #eqs
@@ -50,9 +56,15 @@ public:
     matrix_t           outside;     //!< possible outside solutions
     vector_t           out;         //!< resulting from mix, using the lua "weights" function
     vector_t           weights;     //!< to store weights
+
+    //__________________________________________________________________________
+    //
+    // Physical Part
+    //__________________________________________________________________________
     const double       T;           //!< temperature
-    const double       E2Z;         //!< zeta = E2Z * Em, E2Z=F/(1000*R*T)
+    const double       E2Z;         //!< zeta  = E2Z * Em, E2Z=F/(1000*R*T)
     const double       Z2E;         //!< Em/mV = Z2E * zeta
+    const double       Cm;          //!< surface capacitance
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);

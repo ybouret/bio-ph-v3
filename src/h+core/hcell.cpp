@@ -2,10 +2,13 @@
 #include "yocto/exception.hpp"
 #include "yocto/lua/lua-config.hpp"
 
-const char * HCell:: PARAMS_REG[] = { "zeta", "V", "S" };
+const char * HCell:: PARAMS_REG[] = { "Em", "V", "S" };
 const size_t HCell:: PARAMS_NUM   = sizeof(HCell::PARAMS_REG)/sizeof(HCell::PARAMS_REG[0]);
 
 HCell:: ~HCell() throw() {}
+
+
+#define HCELL_LUA_GET(FIELD) FIELD( Lua::Config::Get<lua_Number>(L,#FIELD) )
 
 HCell:: HCell(lua_State   *vm,
               const double t0,
@@ -26,15 +29,16 @@ in(nvar,0),
 outside(),
 out(M,0.0),
 weights(),
-T( Lua::Config::Get<lua_Number>(L,"T" ) ),
+HCELL_LUA_GET(T),
 E2Z( Y_FARADAY / (1000.0*Y_R*T) ),
-Z2E(1.0/E2Z)
+Z2E(1.0/E2Z),
+HCELL_LUA_GET(Cm)
 {
 
     params_reg.release();
     std::cerr << lib << std::endl;
     std::cerr << eqs << std::endl;
-    //std::cerr << eff << std::endl;
+    std::cerr << eff << std::endl;
 
     //__________________________________________________________________________
     //
