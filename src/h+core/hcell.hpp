@@ -17,8 +17,10 @@
 class HCell
 {
 public:
-    static const char  *PARAMS_REG[]; //!< built-in parameters: zeta, V, S
-    static const size_t PARAMS_NUM;   //!< #PARAMS_REG
+    static const char  *PARAMS_NAMES_REG[]; //!< built-in parameter names: zeta, V, S
+    static const char  *PARAMS_LOADS_REG[]; //!< built-in parameter loads: zeta0, volume, surface
+    static const size_t PARAMS_EXTRA_NUM;   //! the number
+
     typedef vector<string,memory::pooled::allocator> vector_s;
     //!
     /**
@@ -46,8 +48,7 @@ public:
     __lua::Equilibria  eqs;         //!< the global chemical system
     const size_t      &N;           //!< #eqs
     const size_t      &M;           //!< #species
-    vector_s           params_reg;  //!< all the species
-    parameters         params;      //!< extra parameters, initially 0
+    variables          params;      //!< extra parameters, initially 0
     const size_t      &nvar;        //!< params.size
     __lua::Effectors   eff;         //!< effectors
     vector_t           inside;      //!< initial inside concentration (+extra vars)
@@ -66,10 +67,30 @@ public:
     const double       Z2E;         //!< Em/mV = Z2E * zeta
     const double       Cm;          //!< surface capacitance
 
+    //__________________________________________________________________________
+    //
+    // differential part
+    //__________________________________________________________________________
+    diff_solver   odeint; //!< solver, initialized for nvar
+    const double  diff_h; //!< initial time step for each dt
+    diff_equation diffeq; //!< use Call, calling virtual Rates...
+    size_t        ncalls; //!< internal counter
+    
+
+    //__________________________________________________________________________
+    //
+    // I/O functions
+    //__________________________________________________________________________
+    void add_header( ios::ostream &fp ) const;
+    void add_values( ios::ostream &fp, const array<double> &Y ) const;
+
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);
     const array<string> & fill_params_reg(const char  *extra_params_reg[],
                                           const size_t extra_params_num);
+
+    void Call( array<double> &dYdt, double t, const array<double> &Y );
+
 };
 
 
