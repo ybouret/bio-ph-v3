@@ -7,7 +7,15 @@
 class Cell : public HCell
 {
 public:
-    
+    Cell(lua_State *vm) : HCell(vm,0,0,0) {}
+    virtual ~Cell() throw() {}
+
+    virtual void Rates( array<double> &dYdt, double t, const array<double> &Y )
+    {
+    }
+
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);
 };
 
 YOCTO_PROGRAM_START()
@@ -18,7 +26,7 @@ YOCTO_PROGRAM_START()
         Lua::Config::DoFile(vm(),argv[1]);
     }
 
-    HCell cell(vm(),0.0,NULL,0);
+    Cell cell(vm());
     std::cerr << "Surf_exp=" << Lua::Config::Get<lua_Number>(vm(), "Surf_exp") << std::endl;
     std::cerr << "surface =" << Lua::Config::Get<lua_Number>(vm(), "surface")  << std::endl;
 

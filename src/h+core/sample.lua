@@ -83,8 +83,8 @@ eff =
 -- parameters
 --
 -- -----------------------------------------------------------------------------
-
-zeta0 = 0 * F/(R*T);
+Em    = -60e-3;
+zeta0 = Em * F/(R*T);
 
 a    = 12.5; -- in microns
 b    = 5;    -- in microns
@@ -129,15 +129,22 @@ end
 PermConv=1e-15/Surf_exp; -- mol/L => mol/m^2 and use experimental surface
 
 -- -----------------------------------------------------------------------------
--- INWARD Na moles/s/mu^2
+-- INWARD Na in mol/L. moles/s/mu^2
 -- -----------------------------------------------------------------------------
 function lambda_Na(t,Cin,Cout,params)
 local zeta = params["zeta"];
 local zz   = zeta;
 local Na   = "Na+";
+local S    = params["S"];
+local V    = params["V"];
+
 a = {};
-local rho =  Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta) * PermConv;
-a[Na] = rho;
+local Perm =  SP_Na(t,zeta)/Surf_exp;                    -- in microns/s
+local Flux =  Perm * Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)); -- in moles/L*microns/s
+local dQdt =  Flux*S;                                    -- in moles/L*microns^3/s
+local Rate =  Flux/V;                                    -- in moles/L
+a[Na]      =  Rate;
 return a;
+
 end
 
