@@ -89,6 +89,9 @@ ncalls(0)
     //__________________________________________________________________________
     in = inside;
     std::cerr << "in=" << inside << std::endl;
+
+    odeint.start(nvar);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +173,7 @@ void HCell:: ComputeOutsideComposition(const double t)
 // Output functions
 //
 ////////////////////////////////////////////////////////////////////////////////
-void HCell:: add_header( ios::ostream &fp ) const
+ios::ostream & HCell:: add_header( ios::ostream &fp ) const
 {
     fp << " pH";
     fp << " Em";
@@ -183,9 +186,10 @@ void HCell:: add_header( ios::ostream &fp ) const
         const string &id = (*i)->name;
         fp << ' ' << id;
     }
+    return fp;
 }
 
-void HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
+ios::ostream & HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
 {
     assert(Y.size()>=nvar);
     fp(" %.15g",lib.pH(Y));
@@ -197,7 +201,7 @@ void HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
     {
         fp(" %.15g", Y[i]);
     }
-    
+    return fp;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

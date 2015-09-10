@@ -100,6 +100,7 @@ public:
      */
     double ComputeVolumicChargeRate(double zeta);
 
+    //! compute all rates
     virtual void Rates( array<double> &dYdt, double t, const array<double> &Y ) = 0;
 
     //! solve the Rates equation from t0 to t1
@@ -109,8 +110,8 @@ public:
     //
     // I/O functions
     //__________________________________________________________________________
-    void add_header( ios::ostream &fp ) const;
-    void add_values( ios::ostream &fp, const array<double> &Y ) const;
+    ios::ostream & add_header( ios::ostream &fp ) const;
+    ios::ostream & add_values( ios::ostream &fp, const array<double> &Y ) const;
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);

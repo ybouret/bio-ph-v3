@@ -1,17 +1,42 @@
 #include "hcell.hpp"
 #include "yocto/program.hpp"
 #include "yocto/lua/lua-config.hpp"
-
+#include "yocto/math/kernel/tao.hpp"
+#include "yocto/ios/ocstream.hpp"
 
 
 class Cell : public HCell
 {
 public:
-    Cell(lua_State *vm) : HCell(vm,0,0,0) {}
+    Cell(lua_State *vm) : HCell(vm,0.0,0,0) {}
     virtual ~Cell() throw() {}
 
+    //! come with a legal composition
     virtual void Rates( array<double> &dYdt, double t, const array<double> &Y )
     {
+        assert(Y.size()==nvar);
+        // outside
+        ComputeOutsideComposition(t);
+
+        // get fluxes: moles/m^2/s
+        eff.rate(rho,t,Y,out,params);
+
+        // convert into dCdt
+        const double S = Y[iSurface]*1e-6; // m^2
+        const double V = Y[iVolume]*1e-15; // L
+        const double J2C = S/V;
+        for(size_t i=M;i>0;--i)
+        {
+            rho[i] *= J2C;
+        }
+
+        // chemical reactions
+        eqs.absorb(t,rho,Y);
+
+        for(size_t i=M;i>0;--i)
+        {
+            dYdt[i] = rho[i];
+        }
     }
 
 private:
@@ -30,15 +55,15 @@ YOCTO_PROGRAM_START()
     std::cerr << "Surf_exp=" << Lua::Config::Get<lua_Number>(vm(), "Surf_exp") << std::endl;
     std::cerr << "surface =" << Lua::Config::Get<lua_Number>(vm(), "surface")  << std::endl;
 
-    cell.ComputeOutsideComposition(0);
-    cell.ComputeVolumicChargeRate(cell.inside[cell.iZeta]);
-    std::cerr << "rho=" << cell.rho << std::endl;
-    cell.ComputeVolumicChargeRate(0);
-    std::cerr << "rho=" << cell.rho << std::endl;
-    cell.ComputeVolumicChargeRate(-cell.inside[cell.iZeta]);
-    std::cerr << "rho=" << cell.rho << std::endl;
+    vector_t Y = cell.inside;
 
-    //cell.lib.display(std::cerr,cell.rho) << std::endl;
+    {
+        ios::ocstream fp("sim.dat",false);
+        cell.add_header(fp << "#t") << "\n";
+        fp("%g ", 0.0); cell.add_values(fp,Y) << "\n";
+    }
+    
+
 }
 YOCTO_PROGRAM_END()
 
