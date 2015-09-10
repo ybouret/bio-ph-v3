@@ -14,9 +14,9 @@ INCLUDE("${YROOT}/share/yocto/rules.cmake")
 INCLUDE_DIRECTORIES("${YROOT}/include")
 LINK_DIRECTORIES("${YROOT}/lib")
 
-ADD_SUBDIRECTORY(h+cell)
-ADD_SUBDIRECTORY(modelplos)
-ADD_SUBDIRECTORY(onlyvol)
+#ADD_SUBDIRECTORY(h+cell)
+#ADD_SUBDIRECTORY(onlyvol)
 
 ADD_SUBDIRECTORY(h+core)
+ADD_SUBDIRECTORY(modelplos)
 
