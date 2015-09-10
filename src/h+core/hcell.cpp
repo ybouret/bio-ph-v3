@@ -88,8 +88,9 @@ ncalls(0)
     // end initializing
     //__________________________________________________________________________
     in = inside;
-    std::cerr << "in=" << inside << std::endl;
-
+    std::cerr << "in =" << in     << std::endl;
+    ComputeOutsideComposition(t0);
+    std::cerr << "out=" << out    << std::endl;
     odeint.start(nvar);
 
 }
@@ -205,10 +206,8 @@ ios::ostream & HCell:: add_values( ios::ostream &fp, const array<double> &Y ) co
 double HCell:: ComputeVolumicChargeRate(double zeta)
 {
     in[iZeta] = zeta;
-    std::cerr << "in=" << in << std::endl;
     eff.rate(rho, tmx, in, out, params);
-    std::cerr << "J=" << rho << std::endl;
-
+    
     const double S = in[iSurface]*1e-6; // m^2
     const double V = in[iVolume]*1e-15; // L
     const double fac = (Y_FARADAY*S/V);
@@ -218,6 +217,46 @@ double HCell:: ComputeVolumicChargeRate(double zeta)
     }
     return lib.charge(rho);
 }
+
+const double HCell:: ZETA_MAX = 5.0;
+
+#include "yocto/math/fcn/zfind.hpp"
+
+double HCell:: ComputeRestingZeta(const double t)
+{
+    tmx = t;
+    ComputeOutsideComposition(t);
+    for(size_t i=1;i<=nvar;++i)
+    {
+        in[i] = inside[i];
+    }
+
+    const double zeta_step = 0.1;
+    double zeta = 0.1;
+    numeric<double>::function F(this, & HCell:: ComputeVolumicChargeRate);
+
+    do
+    {
+        const double Fm = F(-zeta);
+        const double Fp = F( zeta);
+        if(Fm*Fp<0)
+        {
+            break;
+        }
+        zeta += zeta_step;
+        if(zeta>ZETA_MAX)
+            throw exception("Cannot find a resting potential!");
+    }
+    while(true);
+
+    zfind<double> solve(0);
+    zeta = solve(F,-zeta,zeta);
+    inside[iZeta] = zeta;
+    std::cerr << "zeta=" << zeta << "-> Em=" << Z2E * zeta << " mV, dQdt=" << ComputeVolumicChargeRate(zeta) << std::endl;
+    return zeta;
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

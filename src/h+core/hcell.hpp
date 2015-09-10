@@ -21,7 +21,8 @@ public:
     static const char  *PARAMS_NAMES_REG[]; //!< built-in parameter names: zeta, V, S
     static const char  *PARAMS_LOADS_REG[]; //!< built-in parameter loads: zeta0, volume, surface
     static const size_t PARAMS_EXTRA_NUM;   //!< the number
-
+    static const double ZETA_MAX;           //!< max value of acceptable zeta
+    
     typedef vector<string,memory::pooled::allocator> vector_s;
     //!
     /**
@@ -93,12 +94,16 @@ public:
     void   ComputeOutsideComposition(const double t);
 
 
-    //! compute individual fluxes from effectors
+    //! compute volumic charge rate
     /**
      assuming out is computed, and using in
      \return the algebraic signed flux, moles/s/m^2
      */
     double ComputeVolumicChargeRate(double zeta);
+
+    //! compute no-flux zeta
+    double ComputeRestingZeta(const double t);
+
 
     //! compute all rates
     virtual void Rates( array<double> &dYdt, double t, const array<double> &Y ) = 0;

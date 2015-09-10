@@ -68,13 +68,16 @@ YOCTO_PROGRAM_START()
     std::cerr << "Surf_exp=" << Lua::Config::Get<lua_Number>(L, "Surf_exp") << std::endl;
     std::cerr << "surface =" << Lua::Config::Get<lua_Number>(L, "surface")  << std::endl;
 
+
+    const double zr = cell.ComputeRestingZeta(0);
+    std::cerr << "zr=" << zr << std::endl;
     vector_t Y = cell.inside;
-    cell.ComputeOutsideComposition(0);
     {
         ios::ocstream fp("sim.dat",false);
         cell.add_header(fp << "#t") << "\n";
         fp("%g", 0.0); cell.add_values(fp,Y) << "\n";
     }
+
 
     //----------------------------------------------------------------------
     //
