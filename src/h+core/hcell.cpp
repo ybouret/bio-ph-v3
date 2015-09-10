@@ -2,9 +2,45 @@
 #include "yocto/exception.hpp"
 #include "yocto/lua/lua-config.hpp"
 
-const char * HCell:: PARAMS_NAMES_REG[] = { "zeta", "V", "S" };
-const char * HCell:: PARAMS_LOADS_REG[] = { "zeta0", "volume", "surface" };
-const size_t HCell:: PARAMS_EXTRA_NUM   = sizeof(HCell::PARAMS_NAMES_REG)/sizeof(HCell::PARAMS_NAMES_REG[0]);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// HVariables
+//
+////////////////////////////////////////////////////////////////////////////////
+const char * HVariables:: NAMES_REG[] = { "zeta", "V", "S" };
+const char * HVariables:: LOADS_REG[] = { "zeta0", "volume", "surface" };
+const size_t HVariables:: EXTRA_NUM   = sizeof(HVariables::NAMES_REG)/sizeof(HVariables::NAMES_REG[0]);
+HVariables:: ~HVariables() throw() {}
+
+HVariables:: HVariables() :
+names(EXTRA_NUM,as_capacity),
+loads(EXTRA_NUM,as_capacity)
+{
+    for(size_t i=0;i<EXTRA_NUM;++i)
+    {
+        const string name = NAMES_REG[i];
+        const string load = LOADS_REG[i];
+        names.push_back(name);
+        loads.push_back(load);
+    }
+}
+
+void HVariables:: ReleaseContent() throw()
+{
+    loads.release();
+    names.release();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// HCells
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 HCell:: ~HCell() throw() {}
 
@@ -16,12 +52,13 @@ HCell:: HCell(lua_State   *vm,
               const double t0,
               const char  *extra_params_reg[],
               const size_t extra_params_num) :
+HVariables(),
 L(vm),
 lib(vm,"lib"),
 eqs(vm,"eqs",lib),
 N(eqs.N),
 M(eqs.M),
-params(lib, PARAMS_NAMES_REG, PARAMS_LOADS_REG, PARAMS_EXTRA_NUM),
+params(lib,names,loads),
 nvar(params.count),
 iZeta(params["zeta"]),
 iVolume(params["V"]),
@@ -36,7 +73,7 @@ out(M,0.0),
 weights(),
 
 HCELL_LUA_GET(T),
-E2Z( Y_FARADAY / (1000.0*Y_R*T) ),
+E2Z( Y_FARADAY / Y_R*T ),
 Z2E(1.0/E2Z),
 HCELL_LUA_GET(Cm),
 
@@ -46,7 +83,8 @@ diffeq(this, & HCell::Call),
 ncalls(0)
 {
 
-    //params_reg.release();
+    ReleaseContent();
+
     std::cerr << lib << std::endl;
     std::cerr << eqs << std::endl;
     std::cerr << eff << std::endl;
@@ -187,7 +225,7 @@ ios::ostream & HCell:: add_values( ios::ostream &fp, const array<double> &Y ) co
 {
     assert(Y.size()>=nvar);
     fp(" %.15g",lib.pH(Y));
-    fp(" %.15g",Y[iZeta]*Z2E);
+    fp(" %.15g",Y[iZeta]*Z2E*1e-3);
     fp(" %.15g",Y[iVolume]);
     fp(" %.15g",Y[iSurface]);
     fp(" %.15g",lib.osmolarity(Y)-lib.osmolarity(out));
@@ -284,4 +322,18 @@ void HCell:: Call( array<double> &dYdt, double t, const array<double> &Y )
 {
     ++ncalls;
     Rates(dYdt, t, Y);
+
+
+    // compute charges
+    const double V   = Y[iVolume]*1e-15; //!< in Litters
+    const double Smu = Y[iSurface];
+    // TODO: this is a generic behavior ?
+    const double Cs    = (1e-14*Cm); //!< in F/mu^2
+    const double Capa  = Smu * Cs;
+    const double dzCdt = V*lib.charge(dYdt);
+    const double dQdt  = Y_FARADAY*dzCdt;
+    const double dZdt  = (Y_FARADAY*dQdt)/(Y_R*T)/Capa;
+    //std::cerr << "dZdt=" << dZdt << std::endl;
+    dYdt[iZeta] = dZdt;
+
 }

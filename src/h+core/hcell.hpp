@@ -6,6 +6,28 @@
 #include "yocto/ios/ostream.hpp"
 #include "yocto/memory/pooled.hpp"
 
+class HVariables : public object
+{
+public:
+    static const char  *NAMES_REG[]; //!< built-in parameter names: zeta, V, S
+    static const char  *LOADS_REG[]; //!< built-in parameter loads: zeta0, volume, surface
+    static const size_t EXTRA_NUM;   //!< the number
+
+    typedef vector<string,memory::pooled::allocator> vector_s;
+
+    vector_s names;
+    vector_s loads;
+    
+    explicit HVariables();
+    virtual ~HVariables() throw();
+
+protected:
+    void ReleaseContent() throw();
+
+private:
+    YOCTO_DISABLE_COPY_AND_ASSIGN(HVariables);
+};
+
 //! prototype minimal cell
 /**
  - concentrations:      mol/L
@@ -15,15 +37,11 @@
  - surface capacitance: muF/cm^2, 1e-14 F/mu^2
  - Fluxes: mol/m^2/s
  */
-class HCell
+class HCell : public HVariables
 {
 public:
-    static const char  *PARAMS_NAMES_REG[]; //!< built-in parameter names: zeta, V, S
-    static const char  *PARAMS_LOADS_REG[]; //!< built-in parameter loads: zeta0, volume, surface
-    static const size_t PARAMS_EXTRA_NUM;   //!< the number
     static const double ZETA_MAX;           //!< max value of acceptable zeta
     
-    typedef vector<string,memory::pooled::allocator> vector_s;
     //!
     /**
      - Loading species from           "lib"
@@ -69,7 +87,7 @@ public:
     // Physical Part
     //__________________________________________________________________________
     const double       T;           //!< temperature
-    const double       E2Z;         //!< zeta  = E2Z * Em, E2Z=F/(1000*R*T)
+    const double       E2Z;         //!< zeta  = E2Z * Em, E2Z=F/(R*T)
     const double       Z2E;         //!< Em/mV = Z2E * zeta
     const double       Cm;          //!< surface capacitance
 
@@ -94,18 +112,15 @@ public:
     void   ComputeOutsideComposition(const double t);
 
 
-    //! compute volumic charge rate
-    /**
-     assuming out is computed, and using in
-     \return the algebraic signed flux, moles/s/m^2
-     */
-    double ComputeVolumicChargeRate(double zeta);
 
     //! compute no-flux zeta
     double ComputeRestingZeta(const double t);
 
 
-    //! compute all rates
+    //! compute all chemical rates
+    /**
+     the change in zeta is automatically computed
+     */
     virtual void Rates( array<double> &dYdt, double t, const array<double> &Y ) = 0;
 
     //! solve the Rates equation from t0 to t1
@@ -124,6 +139,13 @@ private:
                                           const size_t extra_params_num);
 
     void Call( array<double> &dYdt, double t, const array<double> &Y );
+
+    //! compute volumic charge rate
+    /**
+     assuming out is computed, and using in
+     \return the algebraic signed flux, moles/s/m^2
+     */
+    double ComputeVolumicChargeRate(double zeta);
 
 };
 

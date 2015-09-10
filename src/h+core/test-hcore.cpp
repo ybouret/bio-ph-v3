@@ -24,7 +24,7 @@ public:
 
         // convert into dCdt
         const double S = Y[iSurface]*1e-12; // m^2
-        const double V = Y[iVolume]*1e-15; // L
+        const double V = Y[iVolume] *1e-15; // L
         const double J2C = S/V;
         for(size_t i=M;i>0;--i)
         {
@@ -36,17 +36,6 @@ public:
         // chemical reactions
         eqs.absorb(t,dYdt,Y);
 
-
-        // compute charges
-        // TODO: this is a generic behavior ?
-        const double zSurf = Y[iSurface];
-        const double Cs    = (1e-14*Cm);
-        const double Capa  = zSurf * Cs;
-        const double dzCdt = V*lib.charge(dYdt);
-        const double dQdt  = Y_FARADAY*dzCdt;
-        const double dZdt  = (Y_FARADAY*dQdt)/(Y_R*T)/Capa;
-        //std::cerr << "dZdt=" << dZdt << std::endl;
-        dYdt[iZeta] = dZdt;
 
         //std::cerr << "dYdt=" << dYdt << std::endl;
     }
