@@ -15,6 +15,7 @@ lib =
     {"HO-", -1},
     {"Na+",  1},
     {"Cl-", -1},
+    {"K+",   1},
     {"OSM",  0}
 };
 
@@ -35,8 +36,9 @@ ini =
 {
     { "E/N" },
     { "osmolarity", 300e-3 },
-    { 10e-3, {1,"Na+"} },
-    { 20e-3, {1,"Cl-"} }
+    { 10e-3,  {1,"Na+"} },
+    { 20e-3,  {1,"Cl-"} },
+    { 140e-3, {1,"K+" } }
 };
 
 -- -----------------------------------------------------------------------------
@@ -47,7 +49,8 @@ out0 =
     { "E/N" },
     { "osmolarity", 300e-3},
     { 140e-3, {1,"Na+"} },
-    { 100e-3, {1,"Cl-"} }
+    { 100e-3, {1,"Cl-"} },
+    {   4e-3, {1,"K+"}  }
 };
 
 out =
@@ -78,8 +81,9 @@ Surf_exp = Capa_exp / (1e-14*Cm); -- in micron^2
 -- -----------------------------------------------------------------------------
 eff =
 {
-     "lambda_Na" -- ,"lambda_Cl"
-    --"lambda_Cl","lambda_Na"
+     "lambda_K",
+     "lambda_Na",
+     "lambda_Cl"
 };
 
 -- -----------------------------------------------------------------------------
@@ -163,10 +167,30 @@ local zz   = -zeta;
 local Cl = "Cl-";
 
 a = {};
-local Perm = SP_Cl(t,zeta)/Surf_exp; -- in microns/s
+local Perm = SP_Cl(t,zeta)/Surf_exp;                    -- in microns/s
 local Flux = Perm * Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)); -- in moles/L*microns/s
 local J    = 1e-3*Flux;                                 -- in moles/m^2/s
 a[Cl]      = J;
 return a;
 
 end
+
+
+-- -----------------------------------------------------------------------------
+-- INWARD potassium moles/s/m^2
+-- -----------------------------------------------------------------------------
+function lambda_K(t,Cin,Cout,params)
+local zeta = params["zeta"];
+local zz   = zeta;
+local K  = "K+";
+
+a = {};
+local Perm = SP_K(t,zeta)/Surf_exp;                    -- in microns/s
+local Flux = Perm * Psi(zz)*(Cout[K]-Cin[K]*exp(zz));  -- in moles/L*microns/s
+local J    = 1e-3*Flux;                                -- in moles/m^2/s
+a[K] = J;
+return a;
+
+end
+
+
