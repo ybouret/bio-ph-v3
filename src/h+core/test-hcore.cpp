@@ -31,11 +31,11 @@ YOCTO_PROGRAM_START()
     std::cerr << "surface =" << Lua::Config::Get<lua_Number>(vm(), "surface")  << std::endl;
 
     cell.ComputeOutsideComposition(0);
-    cell.ComputeFluxes(cell.inside[cell.iZeta]);
+    cell.ComputeVolumicChargeRate(cell.inside[cell.iZeta]);
     std::cerr << "rho=" << cell.rho << std::endl;
-    cell.ComputeFluxes(0);
+    cell.ComputeVolumicChargeRate(0);
     std::cerr << "rho=" << cell.rho << std::endl;
-    cell.ComputeFluxes(-cell.inside[cell.iZeta]);
+    cell.ComputeVolumicChargeRate(-cell.inside[cell.iZeta]);
     std::cerr << "rho=" << cell.rho << std::endl;
 
     //cell.lib.display(std::cerr,cell.rho) << std::endl;

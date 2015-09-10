@@ -167,7 +167,7 @@ void HCell:: ComputeOutsideComposition(const double t)
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//...
+// Output functions
 //
 ////////////////////////////////////////////////////////////////////////////////
 void HCell:: add_header( ios::ostream &fp ) const
@@ -202,14 +202,30 @@ void HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-//...
+// Computing Resting Zeta functions
 //
 ////////////////////////////////////////////////////////////////////////////////
-double HCell:: ComputeFluxes(double zeta)
+double HCell:: ComputeVolumicChargeRate(double zeta)
 {
     in[iZeta] = zeta;
     std::cerr << "in=" << in << std::endl;
     eff.rate(rho, tmx, in, out, params);
+    std::cerr << "J=" << rho << std::endl;
+
+    const double S = in[iSurface]*1e-6; // m^2
+    const double V = in[iVolume]*1e-15; // L
+    const double fac = (Y_FARADAY*S/V);
+    for(size_t i=1;i<=M;++i)
+    {
+        rho[i] *= fac;
+    }
     return lib.charge(rho);
+}
+
+
+void HCell:: Step(array<double> &Y, double t0, double t1)
+{
+    double hh = diff_h;
+    odeint(diffeq,Y,t0,t1,hh,&eqs.callback);
 }
 

@@ -11,8 +11,9 @@
  - concentrations:      mol/L
  - volume:              mu^3 = 1e-18 m^2 = 1e-15 L
  - surface:             mu^2
- - potential:           mV
+ - potential:           mV (but use zeta instead)
  - surface capacitance: muF/cm^2, 1e-14 F/mu^2
+ - Fluxes: mol/m^2/s
  */
 class HCell
 {
@@ -53,14 +54,14 @@ public:
     const size_t       iZeta;       //!<
     const size_t       iVolume;     //!<
     const size_t       iSurface;    //!< 
-    __lua::Effectors   eff;         //!< effectors
+    __lua::Effectors   eff;         //!< effectors, must FLUXES !!!
     vector_t           inside;      //!< initial inside concentration (+extra vars)
     double             tmx;         //!< current time
     vector_t           rho;         //!< temporary rates, #M
     vector_t           in;          //!< current inside
     matrix_t           outside;     //!< possible outside solutions
     vector_t           out;         //!< resulting from mix, using the lua "weights" function
-    vector_t           weights;     //!< to store weights
+    vector_t           weights;     //!< to store weights of outsides compositions
 
     //__________________________________________________________________________
     //
@@ -95,12 +96,14 @@ public:
     //! compute individual fluxes from effectors
     /**
      assuming out is computed, and using in
-     \return the algebraic signed flux, moles/s/mu^2
+     \return the algebraic signed flux, moles/s/m^2
      */
-    double ComputeFluxes(double zeta);
+    double ComputeVolumicChargeRate(double zeta);
 
     virtual void Rates( array<double> &dYdt, double t, const array<double> &Y ) = 0;
 
+    //! solve the Rates equation from t0 to t1
+    void Step(array<double> &Y, double t0, double t1);
 
     //__________________________________________________________________________
     //

@@ -126,10 +126,9 @@ function SP_Na(t,x)
 return (1.360058333) * exp( (0.05223441992) * x );
 end
 
-PermConv=1e-15/Surf_exp; -- mol/L => mol/m^2 and use experimental surface
 
 -- -----------------------------------------------------------------------------
--- INWARD Na in mol/L. moles/s/mu^2
+-- INWARD Na in  moles/s/m^2
 -- -----------------------------------------------------------------------------
 function lambda_Na(t,Cin,Cout,params)
 local zeta = params["zeta"];
@@ -138,12 +137,11 @@ local Na   = "Na+";
 local S    = params["S"];
 local V    = params["V"];
 
-a = {};
-local Perm =  SP_Na(t,zeta)/Surf_exp;                    -- in microns/s
-local Flux =  Perm * Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)); -- in moles/L*microns/s
-local dQdt =  Flux*S;                                    -- in moles/L*microns^3/s
-local Rate =  Flux/V;                                    -- in moles/L
-a[Na]      =  Rate;
+a = {}
+local Perm = SP_Na(t,zeta)/Surf_exp;                    -- in microns/s
+local Flux = Perm * Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)); -- in moles/L*microns/s
+local J    = 1e-3 * Flux;                               -- in moles/m^2/s
+a[Na]      = J;
 return a;
 
 end
