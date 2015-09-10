@@ -20,7 +20,7 @@ class HCell
 public:
     static const char  *PARAMS_NAMES_REG[]; //!< built-in parameter names: zeta, V, S
     static const char  *PARAMS_LOADS_REG[]; //!< built-in parameter loads: zeta0, volume, surface
-    static const size_t PARAMS_EXTRA_NUM;   //! the number
+    static const size_t PARAMS_EXTRA_NUM;   //!< the number
 
     typedef vector<string,memory::pooled::allocator> vector_s;
     //!

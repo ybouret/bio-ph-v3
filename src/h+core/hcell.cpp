@@ -94,15 +94,8 @@ ncalls(0)
 
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//
-//...
-//
-////////////////////////////////////////////////////////////////////////////////
-void HCell:: Call( array<double> &dYdt, double t, const array<double> &Y )
-{
-    ++ncalls;
-}
+
+
 
 
 #if 0
@@ -226,10 +219,19 @@ double HCell:: ComputeVolumicChargeRate(double zeta)
     return lib.charge(rho);
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+//
+// differential engine
+//
+////////////////////////////////////////////////////////////////////////////////
 void HCell:: Step(array<double> &Y, double t0, double t1)
 {
     double hh = diff_h;
     odeint(diffeq,Y,t0,t1,hh,&eqs.callback);
 }
 
+void HCell:: Call( array<double> &dYdt, double t, const array<double> &Y )
+{
+    ++ncalls;
+    Rates(dYdt, t, Y);
+}
