@@ -10,6 +10,10 @@ dt      = 0.1;
 dt_save = 0.2;
 t_run   = 60+600+600;
 
+T       = 298;
+
+Em = 0;
+zeta0 = Em * F / (R*T);
 
 -- -----------------------------------------------------------------------------
 --
@@ -193,15 +197,17 @@ end
 -- -----------------------------------------------------------------------------
 
 
-Cm = 10 * 1.0e-15; -- Farad/ micron^2
+Cm = 1; -- muFarad/cm^2
 
 -- -----------------------------------------------------------------------------
 -- Article from which the permeabilities were fitted
 -- -----------------------------------------------------------------------------
 
 
-Capa_exp = 207e-12;       -- from article 207 pF
-Surf_exp = Capa_exp / Cm; -- in micron^2
+Cm      = 1;   -- muF/cm^2
+
+Capa_exp = 207e-12;               -- from article 207 pF
+Surf_exp = Capa_exp / (1e-14*Cm); -- in micron^2
 
 -- -----------------------------------------------------------------------------
 --
@@ -217,45 +223,59 @@ c = 5;    -- in microns
 surface = EllipsoidSurface(a,b,c);
 volume  = EllipsoidVolume(a,b,c);
 
-perm_ratio = 1.0e-15/Surf_exp;
 
 -- -----------------------------------------------------------------------------
--- INWARD Na moles/s/mu^2
+-- INWARD Na in  moles/s/m^2
 -- -----------------------------------------------------------------------------
 function lambda_Na(t,Cin,Cout,params)
 local zeta = params["zeta"];
 local zz   = zeta;
-local Na = "Na+";
-a = {};
-local rho =  Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta)*perm_ratio;
-a[Na] = rho;
+local Na   = "Na+";
+local S    = params["S"];
+local V    = params["V"];
+
+a = {}
+local Perm = SP_Na(t,zeta)/Surf_exp;                    -- in microns/s
+local Flux = Perm * Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)); -- in moles/L*microns/s
+local J    = 1e-3 * Flux;                               -- in moles/m^2/s
+a[Na]      = J;
 return a;
+
 end
 
 -- -----------------------------------------------------------------------------
--- INWARD potassium moles/s/mu^2
--- -----------------------------------------------------------------------------
-function lambda_K(t,Cin,Cout,params)
-local zeta = params["zeta"];
-local zz   = zeta;
-local K  = "K+";
-a = {};
-local rho =  Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta)*perm_ratio;
-a[K] = rho;
-return a;
-end
-
--- -----------------------------------------------------------------------------
--- INWARD chloride moles/s/mu^2
+-- INWARD chloride moles/s/m^2
 -- -----------------------------------------------------------------------------
 function lambda_Cl(t,Cin,Cout,params)
 local zeta = params["zeta"];
 local zz   = -zeta;
 local Cl = "Cl-";
+
 a = {};
-local rho =  Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta)*perm_ratio;
-a[Cl] = rho;
+local Perm = SP_Cl(t,zeta)/Surf_exp;                    -- in microns/s
+local Flux = Perm * Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)); -- in moles/L*microns/s
+local J    = 1e-3*Flux;                                 -- in moles/m^2/s
+a[Cl]      = J;
 return a;
+
+end
+
+
+-- -----------------------------------------------------------------------------
+-- INWARD potassium moles/s/m^2
+-- -----------------------------------------------------------------------------
+function lambda_K(t,Cin,Cout,params)
+local zeta = params["zeta"];
+local zz   = zeta;
+local K  = "K+";
+
+a = {};
+local Perm = SP_K(t,zeta)/Surf_exp;                    -- in microns/s
+local Flux = Perm * Psi(zz)*(Cout[K]-Cin[K]*exp(zz));  -- in moles/L*microns/s
+local J    = 1e-3*Flux;                                -- in moles/m^2/s
+a[K] = J;
+return a;
+
 end
 
 -- -----------------------------------------------------------------------------

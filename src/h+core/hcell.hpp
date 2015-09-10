@@ -88,7 +88,7 @@ public:
     //__________________________________________________________________________
     const double       T;           //!< temperature
     const double       E2Z;         //!< zeta  = E2Z * Em, E2Z=F/(R*T)
-    const double       Z2E;         //!< Em/mV = Z2E * zeta
+    const double       Z2E;         //!< Em    = Z2E * zeta
     const double       Cm;          //!< surface capacitance
 
     //__________________________________________________________________________

@@ -73,7 +73,7 @@ out(M,0.0),
 weights(),
 
 HCELL_LUA_GET(T),
-E2Z( Y_FARADAY / Y_R*T ),
+E2Z( Y_FARADAY / (Y_R*T) ),
 Z2E(1.0/E2Z),
 HCELL_LUA_GET(Cm),
 
@@ -225,7 +225,7 @@ ios::ostream & HCell:: add_values( ios::ostream &fp, const array<double> &Y ) co
 {
     assert(Y.size()>=nvar);
     fp(" %.15g",lib.pH(Y));
-    fp(" %.15g",Y[iZeta]*Z2E*1e-3);
+    fp(" %.15g",Y[iZeta]*Z2E*1000.0);
     fp(" %.15g",Y[iVolume]);
     fp(" %.15g",Y[iSurface]);
     fp(" %.15g",lib.osmolarity(Y)-lib.osmolarity(out));

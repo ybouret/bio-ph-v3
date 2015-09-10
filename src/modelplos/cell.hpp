@@ -1,7 +1,7 @@
 #ifndef PLOS_CELL_INCLUDED
 #define PLOS_CELL_INCLUDED 1
 
-#include "../h+cell/cell.hpp"
+#include "../h+core/hcell.hpp"
 
 class Cell : public HCell
 {

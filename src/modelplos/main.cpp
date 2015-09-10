@@ -35,13 +35,18 @@ int main(int argc, char *argv[])
         const double zm0 = cell.SteadyStateZeta();
         std::cerr << "Zm0=" << zm0 << std::endl;
         std::cerr << "Em0=" << zm0 * cell.Z2E*1000.0 << " mV" << std::endl;
+
+
         cell.SetSteadyStatePotential(-40.0e-3);
         const double zm1 = cell.SteadyStateZeta();
         std::cerr << "Em1=" << zm1 * cell.Z2E*1000.0 << " mV" << std::endl;
 
-        cell.Setup(-60.0e-3);
-        cell.eff.rescale_pace(50);
 
+        cell.Setup(-60.0e-3);
+        //cell.eff.rescale_pace(50);
+
+        return 0;
+        
         //----------------------------------------------------------------------
         //
         // phase space
@@ -52,7 +57,7 @@ int main(int argc, char *argv[])
         std::cerr << "zeta   =" << Y[cell.iZeta]    << ", Em=" << Y[cell.iZeta]*cell.Z2E*1000.0 << std::endl;
         std::cerr << "volume =" << Y[cell.iVolume]  << std::endl;
         std::cerr << "surface=" << Y[cell.iSurface] << std::endl;
-        std::cerr << "activeS=" << Y[cell.iActiveS] << std::endl;
+        //std::cerr << "activeS=" << Y[cell.iActiveS] << std::endl;
 
         std::cerr << "Y=" << Y << std::endl;
 

@@ -6,7 +6,7 @@
 Cell:: ~Cell() throw() {}
 
 Cell:: Cell( lua_State *vm, const double t ) :
-HCell(vm,t),
+HCell(vm,t,NULL,NULL),
 iNa( lib["Na+"]->indx ),
 iK(  lib["K+"]->indx  ),
 iCl( lib["Cl-"]->indx ),
@@ -43,7 +43,7 @@ double Cell:: SteadyStateZeta()
         }
         zeta += zeta_step;
         if(zeta>ZETA_MAX)
-            throw exception("Cannot find a resting potential!");
+            throw exception("Cannot find a zero flux potential!");
     }
     while(true);
 
@@ -176,7 +176,7 @@ void Cell:: Setup(double Em)
     eff.rate(rho, tmx, in, out, params);
     for(size_t i=M;i>0;--i)
     {
-        rho[i] *= inside[iActiveS]/(1e-15*inside[iVolume]);
+        rho[i] *= inside[iSurface]/(1e-15*inside[iVolume]);
     }
     std::cerr << "rho=" << std::endl;
     lib.display(std::cerr, rho) << std::endl;;
@@ -213,60 +213,12 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
         deltaOsm += rho[i];
     }
 
-    //__________________________________________________________________________
-    //
-    //fetch data
-    //__________________________________________________________________________
-    //const double zeta    = Y[iZeta];
-    const double volume  = Y[iVolume];
-    const double litres  = volume * 1e-15;
-    const double activeS = Y[iActiveS];
-    const double surface = Y[iSurface];
-
-    const double S0 = inside[iSurface];
-    const double V0 = inside[iVolume];
-
-    // Let us compute the Vdot
-    const double Vdot = 100.0 * deltaOsm;
-    //const double Vdot = 0;
-    dYdt[iVolume] = Vdot;
-
-    // Model: S=S0*(V/V0)^(2/3)
-    const double Sdot = (2.0*S0*pow(1.0/(volume*V0*V0),1.0/3)*Vdot)/3.0;
-    dYdt[iSurface] = Sdot;
-    //dYdt[iSurface] = 0;
 
     //__________________________________________________________________________
     //
-    //evaluate all surface fluxes in moles/s/micron^2
+    //evaluate all surface fluxes in moles/s/m^2
     //__________________________________________________________________________
     eff.rate(rho, t, Y, out, params);
-
-
-
-    //__________________________________________________________________________
-    //
-    //evaluate concentration changes per unit of time, moles/L
-    //__________________________________________________________________________
-    const double ratio = activeS/litres;
-    const double dlnV  = Vdot/volume;
-    for(size_t i=M;i>0;--i)
-    {
-        dYdt[i] = rho[i] * ratio - Y[i] * dlnV;
-    }
-
-
-    //__________________________________________________________________________
-    //
-    // electric equation...
-    //__________________________________________________________________________
-
-    //TODO: rewrite with a change of surface
-    const double dQdt        = Y_FARADAY * lib.charge(dYdt) * litres;
-    const double Capa        = surface * Cm;
-    const double dzeta       = E2Z * dQdt / Capa;
-
-    dYdt[iZeta] = dzeta;
 
     //__________________________________________________________________________
     //
