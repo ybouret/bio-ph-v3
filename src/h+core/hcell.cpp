@@ -323,7 +323,6 @@ void HCell:: Call( array<double> &dYdt, double t, const array<double> &Y )
     ++ncalls;
     Rates(dYdt, t, Y);
 
-
     // compute charges
     const double V   = Y[iVolume]*1e-15; //!< in Litters
     const double Smu = Y[iSurface];
@@ -333,7 +332,6 @@ void HCell:: Call( array<double> &dYdt, double t, const array<double> &Y )
     const double dzCdt = V*lib.charge(dYdt);
     const double dQdt  = Y_FARADAY*dzCdt;
     const double dZdt  = (Y_FARADAY*dQdt)/(Y_R*T)/Capa;
-    //std::cerr << "dZdt=" << dZdt << std::endl;
-    dYdt[iZeta] = dZdt;
 
+    dYdt[iZeta] = dZdt;
 }

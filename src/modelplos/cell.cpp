@@ -112,6 +112,9 @@ void Cell:: Setup(double Em)
 {
     ComputeOutsideComposition(0.0);
     in = inside;
+
+    std::cerr << std::endl << "Setting Up Cell !" << std::endl;
+    std::cerr << eff << std::endl;
     
     //__________________________________________________________________________
     //
@@ -172,11 +175,11 @@ void Cell:: Setup(double Em)
     const double raw_NHE = rho[iNa];
     NHE.pace = rho_NHE/raw_NHE;
 
-    std::cerr << std::endl;
+    std::cerr << "Testing..." << std::endl;
     eff.rate(rho, tmx, in, out, params);
     for(size_t i=M;i>0;--i)
     {
-        rho[i] *= inside[iSurface]/(1e-15*inside[iVolume]);
+        rho[i] *= (inside[iSurface]*1e-12)/(1e-15*inside[iVolume]);
     }
     std::cerr << "rho=" << std::endl;
     lib.display(std::cerr, rho) << std::endl;;
@@ -184,6 +187,8 @@ void Cell:: Setup(double Em)
     eqs.absorb(tmx, rho, in);
     std::cerr << "rho1=" << std::endl;
     lib.display(std::cerr, rho) << std::endl;
+
+    std::cerr << eff << std::endl;
 
 }
 
@@ -220,6 +225,19 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     //__________________________________________________________________________
     eff.rate(rho, t, Y, out, params);
 
+
+    //__________________________________________________________________________
+    //
+    // convert in dC/dt
+    //__________________________________________________________________________
+    const double S = Y[iSurface] * 1e-12; //!< mu^2
+    const double V = Y[iVolume]  * 1e-15; //!< L
+    const double J2C = S/V;
+    for(size_t i=M;i>0;--i)
+    {
+        dYdt[i] = rho[i]*J2C;
+    }
+    
     //__________________________________________________________________________
     //
     //chemical absorption + constants variation

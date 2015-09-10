@@ -8,12 +8,13 @@ diff_h = 1e-5; -- initial adaptive time step between to time steps
 
 dt      = 0.1;
 dt_save = 0.2;
-t_run   = 60+600+600;
+t_run   = 10*60;
 
 T       = 298;
 
-Em = 0;
-zeta0 = Em * F / (R*T);
+Em0     = -60e-3;
+
+zeta0 = 0 * F / (R*T);
 
 -- -----------------------------------------------------------------------------
 --
@@ -57,10 +58,10 @@ pKY = 6.2;
 
 function P_CO2(t)
 local  P0    = 40.0;
---local  W     = 60;
---if (t>=5) and (t<=W*math.pi+5) then
---  return P0/760.0 + (40.0/760.0) * math.sin((t-5)/W)^2;
---end
+local  W     = 60;
+if (t>=5) and (t<=W*math.pi+5) then
+  return P0/760.0 + (40.0/760.0) * math.sin((t-5)/W)^2;
+end
 return P0/760;
 end
 
@@ -148,14 +149,6 @@ out =
 
 
 function weights(t)
---local  w = exp(-t);
---return w,1-w;
-if (t<=60) then
-return 1,0
-end
-if(t<=60+600)then
-return 0,1
-end
 return 1,0
 end
 
@@ -315,10 +308,12 @@ local Nae     = Cout["Na+"];
 local KNaeEff = KNae * (1+Cout["H+"]/KHout);
 local sig_out = Nae / (KNaeEff+Nae);
 sig = sig * sig_out;
+
 ans = {}
 ans["H+"]  = -sig;
 ans["Na+"] =  sig;
 return ans;
+
 end
 
 
@@ -329,10 +324,12 @@ K_AE = 10e-3;
 function AE2(t,Cin,Cout,params)
 local b   = Cin["HCO3-"];
 local rho = b/(b+K_AE);
+
 a = {}
 a["Cl-"]   = rho;
 a["HCO3-"] = -rho;
 return a;
+
 end
 
 -- -----------------------------------------------------------------------------
