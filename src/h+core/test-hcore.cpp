@@ -23,7 +23,7 @@ public:
         eff.rate(rho,t,Y,out,params);
 
         // convert into dCdt
-        const double S = Y[iSurface]*1e-6; // m^2
+        const double S = Y[iSurface]*1e-12; // m^2
         const double V = Y[iVolume]*1e-15; // L
         const double J2C = S/V;
         for(size_t i=M;i>0;--i)
@@ -72,6 +72,7 @@ YOCTO_PROGRAM_START()
     const double zr = cell.ComputeRestingZeta(0);
     std::cerr << "zr=" << zr << std::endl;
     vector_t Y = cell.inside;
+    Y[cell.iZeta] += 0.01;
     {
         ios::ocstream fp("sim.dat",false);
         cell.add_header(fp << "#t") << "\n";

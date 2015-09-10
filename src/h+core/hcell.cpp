@@ -206,16 +206,27 @@ ios::ostream & HCell:: add_values( ios::ostream &fp, const array<double> &Y ) co
 double HCell:: ComputeVolumicChargeRate(double zeta)
 {
     in[iZeta] = zeta;
+    // compute fluxes in moles/m^2/s
     eff.rate(rho, tmx, in, out, params);
-    
-    const double S = in[iSurface]*1e-6; // m^2
+
+    // convert in dC/dt
     const double V = in[iVolume]*1e-15; // L
-    const double fac = (Y_FARADAY*S/V);
+    const double S = in[iSurface]*1e-12; // meters
+    const double J2C = S/V;
     for(size_t i=1;i<=M;++i)
     {
-        rho[i] *= fac;
+        rho[i] *= J2C;
     }
-    return lib.charge(rho);
+
+    const double zSurf = in[iSurface];
+    const double Cs    = (1e-14*Cm);
+    const double Capa  = zSurf * Cs;
+    const double dzCdt = V*lib.charge(rho);
+    const double dQdt  = Y_FARADAY*dzCdt;
+    const double dZdt  = (Y_FARADAY*dQdt)/(Y_R*T)/Capa;
+    
+    
+    return dZdt;
 }
 
 const double HCell:: ZETA_MAX = 5.0;
@@ -252,7 +263,7 @@ double HCell:: ComputeRestingZeta(const double t)
     zfind<double> solve(0);
     zeta = solve(F,-zeta,zeta);
     inside[iZeta] = zeta;
-    std::cerr << "zeta=" << zeta << "-> Em=" << Z2E * zeta << " mV, dQdt=" << ComputeVolumicChargeRate(zeta) << std::endl;
+    std::cerr << "zeta=" << zeta << "-> Em=" << Z2E * zeta << " mV, dZdt=" << ComputeVolumicChargeRate(zeta) << std::endl;
     return zeta;
 }
 
