@@ -43,8 +43,7 @@ YOCTO_PROGRAM_START()
     const double Em0 = Lua::Config::Get<lua_Number>(L,"Em0");
     cell.Setup(Em0);
 
-    cell.eff.rescale_pace(50);
-
+    
 
     //--------------------------------------------------------------------------
     //

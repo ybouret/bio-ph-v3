@@ -1,6 +1,7 @@
 ADD_EXECUTABLE(modelplos main.cpp
 	cell.hpp cell.cpp
 	model.lua
+	lactate.lua
 )
 
 TARGET_LINK_LIBRARIES(modelplos h+core)

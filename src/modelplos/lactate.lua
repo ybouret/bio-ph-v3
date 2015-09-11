@@ -3,13 +3,18 @@
 -- times
 --
 -- -----------------------------------------------------------------------------
-ftol   = 1e-4; -- differential fractional tolerance
-diff_h = 1e-5; -- initial adaptive time step between to time steps
+ftol   = 1e-5; -- differential fractional tolerance
+diff_h = 1e-4; -- initial adaptive time step between to time steps
 
-dt      = 0.1;
-dt_save = 0.2;
-t_run   = 60+600+600;
+dt      = 0.2;
+dt_save = 1;
+t_run   = 1500;
 
+T       = 298;
+
+Em0     = -60e-3;
+
+zeta0 = 0 * F / (R*T);
 
 -- -----------------------------------------------------------------------------
 --
@@ -37,6 +42,8 @@ lib =
     {"CO3--",-2},
     {"HY",    0},
     {"Y-",   -1},
+    {"LacH",  0},
+    {"Lac-", -1},
     {"OSM",   0}
 };
 
@@ -53,10 +60,6 @@ pKY = 6.2;
 
 function P_CO2(t)
 local  P0    = 40.0;
---local  W     = 60;
---if (t>=5) and (t<=W*math.pi+5) then
---  return P0/760.0 + (40.0/760.0) * math.sin((t-5)/W)^2;
---end
 return P0/760;
 end
 
@@ -71,13 +74,14 @@ end
 -- Equilibria
 --
 -- -----------------------------------------------------------------------------
-
+pKLac = 3.86
 eqs =
 {
     { "water", 1e-14, { 1, "H+"}, {  1, "HO-"} },
     { "bicarb", "kappa",          {  1, "H+" }, { 1, "HCO3-"} },
     { "carb",   K2,               {  1, "H+" }, { 1, "CO3--"}, { -1, "HCO3-" } },
-    { "buffer", 10^(-pKY),        { -1, "HY" }, { 1, "Y-"   }, {1, "H+" } },
+    { "lactic",  10^(-pKLac),     { -1, "LacH"}, {1,"Lac-"},{1,"H+"} },
+    { "buffer", 10^(-pKY),        { -1, "HY" }, { 1, "Y-"   }, {1, "H+" } }
 };
 
 eff =
@@ -87,8 +91,8 @@ eff =
     "lambda_Cl",
     "NaK",
     "NHE",
-    "AE2"
-    -- , "inject"
+    "AE2",
+    "MCT"
 };
 
 
@@ -97,7 +101,7 @@ eff =
 -- Inside
 --
 -- -----------------------------------------------------------------------------
-
+NoLactate = { 0, { 1, "LacH"}, {1, "Lac-"}}
 ini =
 {
     { 10^(-7.2), { 1, "H+" } },
@@ -105,7 +109,8 @@ ini =
     { 10e-3,     { 1, "Na+" } },
     { 20e-3,     { 1, "Cl-" } },
     { "osmolarity", 300e-3},
-    { 0, { 1, "HY"}, {1, "Y-" } }
+    NoLactate,
+    { 00e-3, { 1, "HY"}, {1, "Y-" } },
 };
 
 
@@ -122,6 +127,7 @@ init0 =
     { 140e-3,       { 1, "Na+" } },
     { 100e-3,       { 1, "Cl-" } },
     { "osmolarity", 300e-3 },
+    NoLactate,
     { 0, { 1, "HY"}, {1, "Y-" } }
 }
 
@@ -132,6 +138,7 @@ init1 =
     { 140e-3,       { 1, "Na+" } },
     { 100e-3,       { 1, "Cl-" } },
     { "osmolarity",  300e-3 },
+    NoLactate,
     { 0, { 1, "HY"}, {1, "Y-" } }
 }
 
@@ -144,25 +151,7 @@ out =
 
 
 function weights(t)
---local  w = exp(-t);
---return w,1-w;
-if (t<=60) then
 return 1,0
-end
-if(t<=60+600)then
-return 0,1
-end
-return 1,0
-end
-
--- -----------------------------------------------------------------------------
--- Helper
--- -----------------------------------------------------------------------------
-
-function TableSumValues(X)
-ans = 0;
-for key,value in pairs(X) do ans = ans+value; end
-return ans;
 end
 
 -- -----------------------------------------------------------------------------
@@ -188,20 +177,16 @@ function SP_Na(t,x)
 return (1.360058333) * exp( (0.05223441992) * x );
 end
 
--- -----------------------------------------------------------------------------
--- Common surface capacitance
--- -----------------------------------------------------------------------------
-
-
-Cm = 10 * 1.0e-15; -- Farad/ micron^2
 
 -- -----------------------------------------------------------------------------
 -- Article from which the permeabilities were fitted
 -- -----------------------------------------------------------------------------
 
 
-Capa_exp = 207e-12;       -- from article 207 pF
-Surf_exp = Capa_exp / Cm; -- in micron^2
+Cm      = 1;   -- muF/cm^2
+
+Capa_exp = 207e-12;               -- from article 207 pF
+Surf_exp = Capa_exp / (1e-14*Cm); -- in micron^2
 
 -- -----------------------------------------------------------------------------
 --
@@ -217,49 +202,64 @@ c = 5;    -- in microns
 surface = EllipsoidSurface(a,b,c);
 volume  = EllipsoidVolume(a,b,c);
 
-perm_ratio = 1.0e-15/Surf_exp;
+PermRatio = 30.0/Surf_exp;
 
 -- -----------------------------------------------------------------------------
--- INWARD Na moles/s/mu^2
+-- INWARD Na in  moles/s/m^2
 -- -----------------------------------------------------------------------------
 function lambda_Na(t,Cin,Cout,params)
 local zeta = params["zeta"];
 local zz   = zeta;
-local Na = "Na+";
-a = {};
-local rho =  Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)) * SP_Na(t,zeta)*perm_ratio;
-a[Na] = rho;
+local Na   = "Na+";
+local S    = params["S"];
+local V    = params["V"];
+
+a = {}
+local Perm = SP_Na(t,zeta)*PermRatio;                   -- in microns/s
+local Flux = Perm * Psi(zz)*(Cout[Na]-Cin[Na]*exp(zz)); -- in moles/L*microns/s
+local J    = 1e-3 * Flux;                               -- in moles/m^2/s
+a[Na]      = J;
 return a;
+
 end
 
 -- -----------------------------------------------------------------------------
--- INWARD potassium moles/s/mu^2
--- -----------------------------------------------------------------------------
-function lambda_K(t,Cin,Cout,params)
-local zeta = params["zeta"];
-local zz   = zeta;
-local K  = "K+";
-a = {};
-local rho =  Psi(zz)*(Cout[K]-Cin[K]*exp(zz)) * SP_K(t,zeta)*perm_ratio;
-a[K] = rho;
-return a;
-end
-
--- -----------------------------------------------------------------------------
--- INWARD chloride moles/s/mu^2
+-- INWARD chloride moles/s/m^2
 -- -----------------------------------------------------------------------------
 function lambda_Cl(t,Cin,Cout,params)
 local zeta = params["zeta"];
 local zz   = -zeta;
 local Cl = "Cl-";
+
 a = {};
-local rho =  Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)) * SP_Cl(t,zeta)*perm_ratio;
-a[Cl] = rho;
+local Perm = SP_Cl(t,zeta)*PermRatio;                   -- in microns/s
+local Flux = Perm * Psi(zz)*(Cout[Cl]-Cin[Cl]*exp(zz)); -- in moles/L*microns/s
+local J    = 1e-3*Flux;                                 -- in moles/m^2/s
+a[Cl]      = J;
 return a;
+
+end
+
+
+-- -----------------------------------------------------------------------------
+-- INWARD potassium moles/s/m^2
+-- -----------------------------------------------------------------------------
+function lambda_K(t,Cin,Cout,params)
+local zeta = params["zeta"];
+local zz   = zeta;
+local K  = "K+";
+
+a = {};
+local Perm = SP_K(t,zeta)*PermRatio;                   -- in microns/s
+local Flux = Perm * Psi(zz)*(Cout[K]-Cin[K]*exp(zz));  -- in moles/L*microns/s
+local J    = 1e-3*Flux;                                -- in moles/m^2/s
+a[K] = J;
+return a;
+
 end
 
 -- -----------------------------------------------------------------------------
--- NaK/ATPase INWARD moles/s, unscaled
+-- NaK/ATPase INWARD moles/s/m^2, unscaled
 -- -----------------------------------------------------------------------------
 K_NaK = 12e-3;
 
@@ -295,10 +295,12 @@ local Nae     = Cout["Na+"];
 local KNaeEff = KNae * (1+Cout["H+"]/KHout);
 local sig_out = Nae / (KNaeEff+Nae);
 sig = sig * sig_out;
+
 ans = {}
 ans["H+"]  = -sig;
 ans["Na+"] =  sig;
 return ans;
+
 end
 
 
@@ -309,19 +311,24 @@ K_AE = 10e-3;
 function AE2(t,Cin,Cout,params)
 local b   = Cin["HCO3-"];
 local rho = b/(b+K_AE);
+
 a = {}
 a["Cl-"]   = rho;
 a["HCO3-"] = -rho;
 return a;
+
 end
 
 -- -----------------------------------------------------------------------------
--- Changing potential
+-- MCT
 -- -----------------------------------------------------------------------------
+K_Lac = 30e-3;
 
-function inject(t,Cin,Cout,params)
+function MCT(t,Cin,Cout,params)
+local Lac = Cin["Lac-"];
+
 a = {}
-a["Na+"] = 0.01;
+a["LacH"] = - Lac/(K_Lac+Lac);
 return a;
 end
 
