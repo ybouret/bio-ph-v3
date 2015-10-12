@@ -1,6 +1,6 @@
 #include "cell.hpp"
 #include "yocto/exception.hpp"
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/lua/lua-config.hpp"
 
 Cell:: ~Cell() throw() {}

@@ -1,7 +1,7 @@
 #include "hcell.hpp"
 #include "yocto/program.hpp"
 #include "yocto/lua/lua-config.hpp"
-#include "yocto/math/kernel/tao.hpp"
+#include "yocto/math/core/tao.hpp"
 #include "yocto/ios/ocstream.hpp"
 #include "yocto/math/round.hpp"
 
