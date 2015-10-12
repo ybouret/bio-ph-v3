@@ -1,0 +1,109 @@
+\documentclass{revtex4}
+
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath}
+\usepackage{epstopdf}
+\usepackage{bm}
+\usepackage{dsfont}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\begin{document}
+\title{NBC+Lactates}
+\maketitle
+
+\section{Fluxes and metabolism}
+
+\subsection{Passive Fluxes}
+For each species $X$ that may flow through the membrane, we use the GHK flux equation and find
+\begin{equation}
+	j_X = - P_X\left(\zeta\right) \Psi(z_X\zeta)
+	\left([X]_{out} - [X]e^{z_X\zeta}\right)
+\end{equation}
+then
+\begin{equation}
+	\partial_t [X]_{passive} = -\dfrac{S}{V} j_X = \lambda_X.
+\end{equation}
+
+\subsection{Electrogenic fluxes}
+We the the $NaK$-ATPase
+\begin{equation}
+	\dfrac{1}{2} \partial_t \left[K^+\right]_{{NaK}} = -\dfrac{1}{3} \partial_t \left[ Na^+\right]_{{NaK}}
+	= \dfrac{S}{V}\rho_{NaK}
+\end{equation}
+
+The charge conservation imposes the change in potential
+\begin{equation}
+	\partial_t\left( C E\right) + \sum_X z_X F \partial_t\left( V \times  (\left[X\right]_{out}-\left[X\right]) \right) = 0
+\end{equation}
+taking care of the units (here concentrations must be in $mol/m^3$.)
+We may use
+\begin{equation}
+	E = ...
+\end{equation}
+
+\subsection{Electroneutral Fluxes}
+\begin{itemize}
+	\item $NHE$, 
+	\begin{equation}
+	\partial_t \left[Na^+\right]_{NHE} = - \partial_t \left[H^+\right]_{NHE} = \dfrac{S}{V} \rho_{NHE}
+	\end{equation}
+	
+	\item $AE$,
+	\begin{equation}
+	\partial_t \left[Cl^-\right]_{AE} = -\partial_t \left[HCO_3^-\right]_{AE} = \dfrac{S}{V} \rho_{AE}
+	\end{equation}
+	
+	\item $NBC$,
+	\begin{equation}
+	\partial_t \left[Na^+\right]_{NBC} = \partial_t \left[[HCO_3^-\right]_{NBC} = \dfrac{S}{V} \rho_{NBC}
+	\end{equation}
+		
+	\item Lactic acid, with $MCT_u$
+	\begin{equation}
+	\partial_t \left[LacH\right] = \sum_u \dfrac{S}{V}\rho_{MCT_u}
+	\end{equation}
+\end{itemize}
+
+\subsection{Internal Production}
+
+\subsubsection{$CO_2$}
+The $CO_2$ transport is equivalent to an effective $CO_2$ partial pressure $\Pi_{CO_2}$.
+
+\subsubsection{Lactic acid}
+We assume that the lactic acid is produced with and internal rate
+\begin{equation}
+	\Lambda = \Lambda_0 \times \sigma_{PFK}\left(\dfrac{h}{K_{PFK}}\right)
+\end{equation}
+
+\section{Chemical Reactions}
+
+\subsection{Water}
+\begin{equation}
+	H_2O \rightleftharpoons H^+ + HO^-, \; K_w = 10^{-14} = \left[H^+\right]\left[HO^-\right]
+\end{equation}	
+
+\subsection{Carbonic system}
+\begin{equation}
+	CO_2 \rightleftharpoons H^+ + HCO_3^-, \; K_1' = \dfrac{K_1}{K_H} = \dfrac{\left[H^+\right]\left[HCO_3^-\right]}{\Pi_{CO_2}}
+\end{equation}
+\begin{equation}
+	HCO_3^- \rightleftharpoons H^+ + CO_3^{2-}, \; K_2  \dfrac{\left[H^+\right]\left[CO_3^{2-}\right]}{\left[HCO_3^-\right]}
+\end{equation}
+\subsection{Lactic Acid}
+\begin{equation}
+	LacH \rightleftharpoons H^+ + Lac^-, \; K_{Lac} = \dfrac{\left[H^+\right]\left[Lac^-\right]}{\left[LacH\right]}
+\end{equation}
+
+\section{ODE}
+Using $Na^+,K^+$ and $Cl^-$ leaks	
+\begin{equation}
+\begin{array}{rcl}
+	\partial_t E & = & \\
+	\partial_t \left[H^+\right] & = \\
+	\partial_t \left[HO^-\right] & = \\
+\end{array}
+\end{equation}
+
+
+\end{document}
+
