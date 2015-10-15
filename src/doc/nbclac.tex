@@ -14,15 +14,16 @@
 \section{Fluxes and metabolism}
 
 \subsection{Passive Fluxes}
-For each species $X$ that may flow through the membrane, we use the GHK flux equation and find
+For each species $X$ that may flow through the membrane, we use the GHK flux equation and find the intake flux
 \begin{equation}
-	j_X = - P_X\left(\zeta\right) \Psi(z_X\zeta)
+	j_X =  P_X\left(\zeta\right) \Psi(z_X\zeta)
 	\left([X]_{out} - [X]e^{z_X\zeta}\right)
 \end{equation}
 then
 \begin{equation}
-	\partial_t [X]_{passive} = -\dfrac{S}{V} j_X = \lambda_X.
+	\partial_t [X]_{passive} = \dfrac{S}{V} j_X = \lambda_X.
 \end{equation}
+The permeabilities are provided by electrophysiological measurements.
 
 \subsection{Electrogenic fluxes}
 We the the $NaK$-ATPase
@@ -36,10 +37,6 @@ The charge conservation imposes the change in potential
 	\partial_t\left( C E\right) + \sum_X z_X F \partial_t\left( V \times  (\left[X\right]_{out}-\left[X\right]) \right) = 0
 \end{equation}
 taking care of the units (here concentrations must be in $mol/m^3$.)
-We may use
-\begin{equation}
-	E = ...
-\end{equation}
 
 \subsection{Electroneutral Fluxes}
 \begin{itemize}
@@ -55,7 +52,7 @@ We may use
 	
 	\item $NBC$,
 	\begin{equation}
-	\partial_t \left[Na^+\right]_{NBC} = \partial_t \left[[HCO_3^-\right]_{NBC} = \dfrac{S}{V} \rho_{NBC}
+	\partial_t \left[Na^+\right]_{NBC} = \partial_t \left[HCO_3^-\right]_{NBC} = \dfrac{S}{V} \rho_{NBC}
 	\end{equation}
 		
 	\item Lactic acid, with $MCT_u$
@@ -87,7 +84,7 @@ We assume that the lactic acid is produced with and internal rate
 	CO_2 \rightleftharpoons H^+ + HCO_3^-, \; K_1' = \dfrac{K_1}{K_H} = \dfrac{\left[H^+\right]\left[HCO_3^-\right]}{\Pi_{CO_2}}
 \end{equation}
 \begin{equation}
-	HCO_3^- \rightleftharpoons H^+ + CO_3^{2-}, \; K_2  \dfrac{\left[H^+\right]\left[CO_3^{2-}\right]}{\left[HCO_3^-\right]}
+	HCO_3^- \rightleftharpoons H^+ + CO_3^{2-}, \; K_2  = \dfrac{\left[H^+\right]\left[CO_3^{2-}\right]}{\left[HCO_3^-\right]}
 \end{equation}
 \subsection{Lactic Acid}
 \begin{equation}
@@ -95,14 +92,98 @@ We assume that the lactic acid is produced with and internal rate
 \end{equation}
 
 \section{ODE}
-Using $Na^+,K^+$ and $Cl^-$ leaks	
+\subsection{Matter transformation}
+Using $Na^+,K^+$ and $Cl^-$ leaks, and we take into account the molar rate of each reaction.	
 \begin{equation}
+\left\lbrace
 \begin{array}{rcl}
-	\partial_t E & = & \\
-	\partial_t \left[H^+\right] & = \\
-	\partial_t \left[HO^-\right] & = \\
+	\partial_t \left(C_m S E \right) & = & FS\left(j_{Na^+}+j_{K^+}-j_{Cl^-} - \rho_{NaK}\right) \\
+	\\
+	\partial_t \left[Na^+\right] & = & \dfrac{S}{V}\left(j_{Na^+}+\rho_{NHE}+\rho_{NBC}-3\rho_{NaK}\right) \\
+	\\
+	\partial_t \left[Cl^-\right] & = & \dfrac{S}{V}\left(j_{Cl^-} + \rho_{AE}\right)\\
+	\\
+	\partial_t \left[K^+\right]  & = & \dfrac{S}{V}\left(j_{K^+}+2\rho_{NaK}\right)\\
+	\\
+	\partial_t \left[H^+\right]  & = & \dfrac{S}{V}\left(-\rho_{NHE}\right) + \chi_{w} + \chi_{1'} + \chi_2 + \chi_{Lac}\\
+	\\
+	\partial_t \left[HO^-\right] & = & \chi_{w}\\
+	\\
+	\partial_t \left[HCO_3^-\right] & = & \dfrac{S}{V}\left(\rho_{NBC}-\rho_{AE}\right) + \chi_{1'} - \chi_2 \\
+	\\
+	\partial_t \left[CO_3^{2-}\right] & = & \chi_2\\
+	\\
+	\partial_t \left[LacH\right]      & = & \Lambda - \dfrac{S}{V}\left(\sum_u\rho_{MCT_u}\right) + \chi_{Lac}\\
+	\\
+	\partial_t \left[Lac^-\right]     & = & - \chi_{Lac}\\
+	
 \end{array}
+\right.
 \end{equation}
+
+\subsection{Steady State}
+\begin{itemize}
+\item
+The potential is defined by
+\begin{equation}
+	0 = \dfrac{3}{2}j_{K^+}^\star + j_{Na^+}^\star - j_{Cl^-}^\star
+\end{equation}
+and will produce the GHK potential equation with a regulation by $NaK$-ATPase.
+There is one potential for a given set of permeabilities and inside/outside concentration.
+So the permeabilities may be adjusted to set $E_m^\star$ at will.
+\item One the fluxes are computed, then $V_{NaK}$ may be computed using $K^+$ intake by
+	\begin{equation}
+		0 = j_{K^+}^\star + 2 \rho_{NaK}^\star.
+	\end{equation}
+\item Likewise, $V_{AE}$ may be computed using the $Cl^-$ intake by
+	\begin{equation}
+		0 = j_{Cl^-}^\star + \rho_{AE}^\star
+	\end{equation}
+	The flux of chloride must be negative, since $AE$ should work as a chloride intake.
+\item Finally, we obtain
+\begin{equation}
+	0 = \rho_{NBC}^\star+\rho_{NHE}^\star - \rho_{AE}^\star.
+\end{equation}
+Since $NBC$ and $NHE$ are chemically redundant, we must introduce another parameter $\alpha\in[0:1]$
+such that 
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcr}
+	\rho_{NHE}^\star & = & \alpha \rho_{AE}^\star\\
+	\rho_{NBC}^\star & = & (1-\alpha) \rho_{AE}^\star\\ 
+	\end{array}
+	\right.
+\end{equation}
+
+\end{itemize}
+
+\subsection{System Reduction}
+We use the protic vector of 6 variables
+\begin{equation}
+	\vec{X} = \left( \left[H^+\right]  \left[HO^-\right] \left[HCO_3^-\right] \left[CO_3^{2-}\right] \left[LacH\right]  \left[Lac^-\right] \right)^T
+\end{equation}
+undergoing 4 reactions.
+The topological matrix is
+\begin{equation}
+	\boldsymbol{\nu} =
+	\begin{pmatrix}
+	1 & 1 & 0 & 0 & 0 & 0\\
+	1 & 0 & 1 & 0 & 0 & 0\\
+	1 & 0 & -1 & 1 & 0 & 0\\
+	1 & 0 & 0 & 0  & -1 & 1\\
+	\end{pmatrix}
+\end{equation}
+The equilibrium vector is
+\begin{equation}
+	\vec{\Gamma} =
+	 \begin{pmatrix}
+	K_w - \left[H^+\right]  \left[HO^-\right]\\
+	K_1'\Pi_{CO_2} - \left[H^+\right]\left[HCO_3^-\right]\\
+	K_2 {\left[HCO_3^-\right]} -\left[H^+\right]\left[CO_3^{2-}\right]\\
+	K_{Lac}\left[LacH\right] - \left[H^+\right]\left[Lac^-\right]
+	\end{pmatrix}
+\end{equation}
+
 
 
 \end{document}
