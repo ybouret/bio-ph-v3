@@ -155,6 +155,22 @@ such that
 	\right.
 \end{equation}
 
+
+\item Since we got an open system in lactic acid, we need a basal level of lactic acid (or lactate) concentration.
+Assuming that the production term $\Lambda_0$ is known as well, then we find the expression
+\begin{equation}
+	\Lambda_0 \sigma_{PFK}^\star = \Lambda^\star = \rho_{MCT_1} + \rho_{MCT_4}.
+\end{equation}
+We also need a parameter $\beta$ such that
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcr}
+	\rho_{MCT_1} & = & \beta \Lambda^\star\\
+	\rho_{MCT_4} & = & (1-\beta) \Lambda^\star\\
+	\end{array}
+	\right.
+\end{equation}
+
 \end{itemize}
 
 \subsection{System Reduction}
@@ -184,7 +200,18 @@ The equilibrium vector is
 	\end{pmatrix}
 \end{equation}
 
-
+Neglecting the dissociation of $HCO_3^-$, we get the already intricate expression
+\begin{equation}
+\partial_t h = - \dfrac{S}{V} h^2
+\dfrac{\left(h+K_{Lac}\right)\left(\rho_{NHE}+\rho_{NBC}-\rho_{AE}\right)+K_{Lac}\left(\sum \rho_{MCT}-V\Lambda/S\right)}
+{h^3+(h+K_{Lac})\left(\kappa+K_w\right)+h K_{Lac}\left(h+\left[LacH\right]\right)}
+\end{equation}
+We check that if $\left[LacH\right]\equiv0$, then for any value of $K_{Lac}$, the expression is
+$$
+	\partial_t h\vert_{\left[LacH\right]\equiv0} = 
+	-\dfrac{S}{V} h^2
+	\dfrac{\left(\rho_{NHE}+\rho_{NBC}-\rho_{AE}\right)}{h^2+K_w+\kappa}
+$$
 
 \end{document}
 
