@@ -123,6 +123,7 @@ Using $Na^+,K^+$ and $Cl^-$ leaks, and we take into account the molar rate of ea
 
 \subsection{Steady State}
 \begin{itemize}
+\item We assume that $h^\star$ is known.
 \item
 The potential is defined by
 \begin{equation}
@@ -170,6 +171,16 @@ We also need a parameter $\beta$ such that
 	\end{array}
 	\right.
 \end{equation}
+Assuming that the $MCT$ are not too sensitive to $pH$ within the physiological ranges, we may model their fluxes by
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcl}
+	\rho_{MCT_1} & = & V_{m_1} \dfrac{h}{K_{m_h}+h} \dfrac{\left[Lac^-\right]}{K_{m_1}+\left[Lac^-\right]}\\
+	\\
+	\rho_{MCT_4} & = & V_{m_4} \dfrac{h}{K_{m_h}+h} \dfrac{\left[Lac^-\right]}{K_{m_4}+\left[Lac^-\right]}\\
+	\end{array}
+	\right.
+\end{equation}
 
 \end{itemize}
 
@@ -200,11 +211,11 @@ The equilibrium vector is
 	\end{pmatrix}
 \end{equation}
 
-Neglecting the dissociation of $HCO_3^-$, we get the already intricate expression
+Neglecting the dissociation of $HCO_3^-$, we get the already complicated expression, using $\kappa = K_1'\Pi_{CO_2}$:
 \begin{equation}
 \partial_t h = - \dfrac{S}{V} h^2
 \dfrac{\left(h+K_{Lac}\right)\left(\rho_{NHE}+\rho_{NBC}-\rho_{AE}\right)+K_{Lac}\left(\sum \rho_{MCT}-V\Lambda/S\right)}
-{h^3+(h+K_{Lac})\left(\kappa+K_w\right)+h K_{Lac}\left(h+\left[LacH\right]\right)}
+{h^3+(h+K_{Lac})\left(\kappa+K_w\right)+h K_{Lac}\left(h+\left[LacH\right]\right)}.
 \end{equation}
 We check that if $\left[LacH\right]\equiv0$, then for any value of $K_{Lac}$, the expression is
 $$
