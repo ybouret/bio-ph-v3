@@ -18,7 +18,7 @@ leak_Cl( eff["lambda_Cl"] ),
 NHE( eff["NHE"] ),
 AE2( eff["AE2"] ),
 NaK( eff["NaK"] ),
-alpha( Lua::Config::Get<lua_Number>(vm,"alpha") ),
+alpha( clamp<double>(0,Lua::Config::Get<lua_Number>(vm,"alpha"),1) ),
 NBC( eff["NBC"] )
 {
     NBC.pace = 0.0;
@@ -173,7 +173,7 @@ void Cell:: Setup(double Em)
     //
     // equilibriate for NHE and NBC
     //__________________________________________________________________________
-    const double rho_NHE = rho_AE2;
+    const double rho_NHE_plus_NBC = rho_AE2;
     tao::ld(rho,0);
     NHE.rate(rho, tmx, in, out, params);
     const double raw_NHE = rho[iNa];
@@ -181,8 +181,17 @@ void Cell:: Setup(double Em)
     tao::ld(rho,0);
     NBC.rate(rho, tmx, in, out, params);
     const double raw_NBC = rho[iNa];
+    if(raw_NBC<=0)
+    {
+        throw exception("NBC is not working in the right direction: check mostly [Na+]");
+    }
 
-    NHE.pace = rho_NHE/raw_NHE;
+    NHE.pace = alpha       * rho_NHE_plus_NBC/raw_NHE;
+    NBC.pace = (1.0-alpha) * rho_NHE_plus_NBC/raw_NBC;
+
+    //NHE.pace = rho_NHE/raw_NHE;
+    std::cerr << "Final Effectors Scaling: " << std::endl;
+    std::cerr << eff << std::endl;
 
 #if 0
     std::cerr << "Testing..." << std::endl;

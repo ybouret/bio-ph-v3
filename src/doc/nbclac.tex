@@ -12,6 +12,7 @@
 \maketitle
 
 \section{Fluxes and metabolism}
+$$ R \;\; \mathcal{R}\tan\alpha  \;\; \mathrm{div} \vec{v} $$
 
 \subsection{Passive Fluxes}
 For each species $X$ that may flow through the membrane, we use the GHK flux equation and find the intake flux
@@ -188,28 +189,36 @@ such that
 \item Since we got an open system in lactic acid, we need a basal level of lactic acid (or lactate) concentration.
 Assuming that the production term $\Lambda_0$ is known as well, then we find the expression
 \begin{equation}
-	\Lambda_0 \sigma_{PFK}^\star = \Lambda^\star = \rho_{MCT_1} + \rho_{MCT_4}.
+	\Lambda_0 \sigma_{PFK}^\star = \Lambda^\star = \dfrac{S}{V}\left(\rho_{MCT_1} + \rho_{MCT_4}\right).
 \end{equation}
 We also need a parameter $\beta$ such that
 \begin{equation}
 	\left\lbrace
 	\begin{array}{rcr}
-	\rho_{MCT_1} & = & \beta \Lambda^\star\\
-	\rho_{MCT_4} & = & (1-\beta) \Lambda^\star\\
+	\dfrac{S}{V}\rho_{MCT_1} & = & \beta \Lambda^\star\\
+	\\
+	\dfrac{S}{V}\rho_{MCT_4} & = & (1-\beta) \Lambda^\star\\
 	\end{array}
 	\right.
 \end{equation}
+This parameter $\beta$ is the ratio of lactate elimination by $MCT_1$...
+
 Assuming that the $MCT$ are not too sensitive to pH within the physiological ranges, we may model their fluxes by
 \begin{equation}
 	\left\lbrace
 	\begin{array}{rcl}
-	\rho_{MCT_1} & = & V_{m_1} \dfrac{h}{K_{m_h}+h} \dfrac{\left[Lac^-\right]}{K_{m_1}+\left[Lac^-\right]}\\
+	\rho_{MCT_1} & = & V_{m_1} \dfrac{\left[Lac^-\right]}{K_{m_1}+\left[Lac^-\right]}\\
 	\\
-	\rho_{MCT_4} & = & V_{m_4} \dfrac{h}{K_{m_h}+h} \dfrac{\left[Lac^-\right]}{K_{m_4}+\left[Lac^-\right]}\\
+	\rho_{MCT_4} & = & V_{m_4} \dfrac{\left[Lac^-\right]}{K_{m_4}+\left[Lac^-\right]}\\
 	\end{array}
 	\right.
 \end{equation}
-
+(we may remove the proton dependency, implicit in the lactate concentration).
+Approximately, $MCT_1$ is able to expel the equivalent of $\sigma_{Lac}\approx 1mM/min$, so that, assuming the saturation
+\begin{equation}
+\sigma_{Lac} = \dfrac{S}{V} V_{m_1}
+\end{equation}
+Let us now assume that $L^\star$ is the steady state concentration of lactates.
 \end{itemize}
 
 \subsection{System Reduction}
@@ -245,7 +254,7 @@ Neglecting the dissociation of $HCO_3^-$, we get the already complicated express
 \dfrac{\left(h+K_{Lac}\right)\left(\rho_{NHE}+\rho_{NBC}-\rho_{AE}\right)+K_{Lac}\left(\sum \rho_{MCT}-V\Lambda/S\right)}
 {h^3+(h+K_{Lac})\left(\kappa+K_w\right)+h K_{Lac}\left(h+\left[LacH\right]\right)}.
 \end{equation}
-We check that if $\left[LacH\right]\equiv0$, then for any value of $K_{Lac}$, the expression is
+We check that if $\left[LacH\right]\equiv0$ (ie we remove all the lactic species from the system), then for any value of $K_{Lac}$, the expression is
 $$
 	\partial_t h\vert_{\left[LacH\right]\equiv0} = 
 	-\dfrac{S}{V} h^2
