@@ -324,6 +324,29 @@ return a;
 end
 
 -- -----------------------------------------------------------------------------
+-- NBC
+-- -----------------------------------------------------------------------------
+K_NBC_na = 30e-3; -- NBC Na affinity
+K_NBC_b  =  4e-3; -- NBC bicarb affinity
+
+function sigma_NBC(na,b)
+return (na*b)/(na*b+na/K_NBC_na+b/K_NBC_b);
+end
+
+
+function NBC(t,Cin,Cout,params)
+local na_i = Cin["Na+"];
+local bc_i = Cin["HCO3-"];
+local na_e = Cout["Na+"];
+local bc_e = Count["HCO3-"];
+local rho  = sigma_NBC(na_e,bc_e)-sigma_NBC(na_i,bc_i);
+a= {}
+a["Na+"]   = rho;
+a["HCO3-"] = rho;
+return a;
+end
+
+-- -----------------------------------------------------------------------------
 -- MCT
 -- -----------------------------------------------------------------------------
 K_Lac = 30e-3;

@@ -44,16 +44,40 @@ taking care of the units (here concentrations must be in $mol/m^3$.)
 	\begin{equation}
 	\partial_t \left[Na^+\right]_{NHE} = - \partial_t \left[H^+\right]_{NHE} = \dfrac{S}{V} \rho_{NHE}
 	\end{equation}
+	with
+	\begin{equation}
+		\rho_{NHE} = V_{NHE}...
+	\end{equation}
 	
 	\item $AE$,
 	\begin{equation}
 	\partial_t \left[Cl^-\right]_{AE} = -\partial_t \left[HCO_3^-\right]_{AE} = \dfrac{S}{V} \rho_{AE}
 	\end{equation}
+	with
+	\begin{equation}
+	\rho_{AE} = V_{AE} \dfrac{\left[HCO_3^-\right]}{K_{AE} + \left[HCO_3^-\right]},\;\; K_{AE}\simeq10mM.
+	\end{equation}
 	
 	\item $NBC$,
 	\begin{equation}
-	\partial_t \left[Na^+\right]_{NBC} = \partial_t \left[HCO_3^-\right]_{NBC} = \dfrac{S}{V} \rho_{NBC}
+	\partial_t \left[Na^+\right]_{NBC} = \partial_t \left[HCO_3^-\right]_{NBC} = \dfrac{S}{V} \rho_{NBC}.
 	\end{equation}
+	In a first approximation, $NBC$ works as a two-components, reversible cotransporter
+	\begin{equation}
+		\rho_{NBC} = V_{NBC}
+		 \left[ 
+		 	\sigma_{NBC}\left(\left[Na^+\right]_{out},\left[HCO_3^-\right]_{out}\right) 
+		  - \sigma_{NBC}\left(\left[Na^+\right],\left[HCO_3^-\right]\right) 
+		 \right]
+	\end{equation}
+	and
+	\begin{equation}
+	\sigma_{NBC}\left(\left[Na^+\right],\left[HCO_3^-\right]\right) =
+	\dfrac{\left[Na^+\right]\left[HCO_3^-\right]}
+	{
+		\left[Na^+\right]\left[HCO_3^-\right]+\dfrac{\left[Na^+\right]}{K_{Na}}+\dfrac{\left[HCO_3^-\right]}{K_{BC}},
+	}, \;\; K_{Na} \simeq 30 mM, \; K_{BC} \simeq  4mM.
+	\end{equation}	
 		
 	\item Lactic acid, with $MCT_u$
 	\begin{equation}
