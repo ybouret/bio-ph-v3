@@ -171,14 +171,20 @@ void Cell:: Setup(double Em)
 
     //__________________________________________________________________________
     //
-    // equilibriate for NHE
+    // equilibriate for NHE and NBC
     //__________________________________________________________________________
     const double rho_NHE = rho_AE2;
     tao::ld(rho,0);
     NHE.rate(rho, tmx, in, out, params);
     const double raw_NHE = rho[iNa];
+
+    tao::ld(rho,0);
+    NBC.rate(rho, tmx, in, out, params);
+    const double raw_NBC = rho[iNa];
+
     NHE.pace = rho_NHE/raw_NHE;
 
+#if 0
     std::cerr << "Testing..." << std::endl;
     eff.rate(rho, tmx, in, out, params);
     for(size_t i=M;i>0;--i)
@@ -193,6 +199,7 @@ void Cell:: Setup(double Em)
     lib.display(std::cerr, rho) << std::endl;
 
     std::cerr << eff << std::endl;
+#endif
 
 }
 
