@@ -1,8 +1,10 @@
-ADD_EXECUTABLE(lactates main.cpp
-lactates.lua)
+ADD_EXECUTABLE(nbclac main.cpp
+	cell.hpp cell.cpp
+	nbclac.lua
+)
 
-TARGET_LINK_LIBRARIES(lactates h+core)
-TARGET_LINK_YOCTO(lactates mk lua++ lua chem)
+TARGET_LINK_LIBRARIES(nbclac h+core)
+TARGET_LINK_YOCTO(nbclac mk lua++ lua chem)
 
-INSTALL( TARGETS lactates  RUNTIME DESTINATION bin )
+INSTALL( TARGETS nbclac RUNTIME DESTINATION bin )
 
