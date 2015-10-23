@@ -10,7 +10,8 @@ public:
     const size_t iK;
     const size_t iCl;
     const size_t iH;
-
+    const size_t iB;
+    
     effector &leak_K;
     effector &leak_Na;
     effector &leak_Cl;
@@ -18,6 +19,8 @@ public:
     effector     &NHE;
     effector     &AE2;
     effector     &NaK;
+    const double  alpha;    //!< NHE fraction in [0:1]
+    effector     &NBC;
     
     explicit Cell( lua_State *vm, const double t);
     virtual ~Cell() throw();

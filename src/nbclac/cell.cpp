@@ -11,13 +11,17 @@ iNa( lib["Na+"]->indx ),
 iK(  lib["K+"]->indx  ),
 iCl( lib["Cl-"]->indx ),
 iH(  lib["H+"]->indx  ),
+iB(  lib["HCO3-"]->indx ),
 leak_K(  eff["lambda_K"]  ),
 leak_Na( eff["lambda_Na"] ),
 leak_Cl( eff["lambda_Cl"] ),
 NHE( eff["NHE"] ),
 AE2( eff["AE2"] ),
-NaK( eff["NaK"] )
+NaK( eff["NaK"] ),
+alpha( Lua::Config::Get<lua_Number>(vm,"alpha") ),
+NBC( eff["NBC"] )
 {
+    NBC.pace = 0.0;
 }
 
 #include "yocto/math/fcn/zfind.hpp"
