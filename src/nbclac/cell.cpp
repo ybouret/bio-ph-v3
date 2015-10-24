@@ -38,7 +38,7 @@ double Cell:: SteadyStateZeta()
     in  = inside;
     ComputeOutsideComposition(tmx);
 
-    
+
     const double zeta_step = 0.1;
     double zeta = 0.1;
     numeric<double>::function F(this, & Cell:: ComputePassiveZeroFlux);
@@ -79,7 +79,7 @@ double Cell:: ComputePassiveZeroFlux(double zeta)
 
     leak_Cl.rate(rho, tmx, in, out, params);
     ans -= rho[ iCl ] * leak_Cl.pace;
-    
+
     return ans;
 }
 
@@ -125,7 +125,7 @@ void Cell:: Setup(double Em)
 
     std::cerr << std::endl << "Setting Up Cell !" << std::endl;
     std::cerr << eff << std::endl;
-    
+
     //__________________________________________________________________________
     //
     // Set potential => Lambda etc
@@ -272,9 +272,25 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     //chemical absorption + constants variation
     //__________________________________________________________________________
     eqs.absorb(t, dYdt, Y);
-    
+
 
 }
 
+void Cell:: Powers(double t, const array<double> &Y, double &p1, double &p4)
+{
+    ComputeOutsideComposition(t);
+    //const double S   = Y[iSurface] * 1e-12; //!< mu^2
+   // const double V   = Y[iVolume]  * 1e-15; //!< L
+   // const double J2C = S/V;
+    
+    tao::ld(rho,0);
+    MCT1.rate(rho, t, Y, out, params);
+    p1 = - rho[iLacH]/Vm1;
+
+    tao::ld(rho,0);
+    MCT4.rate(rho, t, Y, out, params);
+    p4 = - rho[iLacH]/Vm4;
+    
+}
 
 

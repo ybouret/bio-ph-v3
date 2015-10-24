@@ -45,6 +45,8 @@ public:
     //! SetSteady state and all paces
     void Setup(double Em);
 
+    void Powers(double t, const array<double> &Y, double &p1, double &p4);
+
 
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(Cell);

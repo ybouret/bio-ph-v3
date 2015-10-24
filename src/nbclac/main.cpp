@@ -7,6 +7,16 @@
 #include "yocto/math/round.hpp"
 #include "yocto/program.hpp"
 
+
+inline
+void save_powers( const string &filename, Cell &cell, double t, const array<double> &Y )
+{
+    ios::acstream fp(filename);
+    double p1=0,p4=0;
+    cell.Powers(t, Y, p1, p4);
+    fp("%g %g %g\n", t, p1, p4);
+}
+
 YOCTO_PROGRAM_START()
 {
     //--------------------------------------------------------------------------
@@ -96,6 +106,13 @@ YOCTO_PROGRAM_START()
         fp("\n");
     }
 
+    const string powerName = "power.dat";
+    {
+        ios::wcstream fp(powerName);
+        fp("#t MCT1 MCT4\n");
+    }
+
+    save_powers(powerName, cell, 0, Y);
     for(size_t i=1;i<=niter;++i)
     {
         const double t0 = (i-1)*dt;
@@ -109,6 +126,7 @@ YOCTO_PROGRAM_START()
             fp("%g",t);
             cell.add_values(fp,Y);
             fp("\n");
+            save_powers(powerName, cell, t, Y);
         }
 
     }
