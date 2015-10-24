@@ -12,7 +12,7 @@
 \maketitle
 
 \section{Fluxes and metabolism}
-$$ R \;\; \mathcal{R}\tan\alpha  \;\; \mathrm{div} \vec{v} $$
+%$$ R \;\; \mathcal{R}\tan\alpha  \;\; \mathrm{div} \vec{v} $$
 
 \subsection{Passive Fluxes}
 For each species $X$ that may flow through the membrane, we use the GHK flux equation and find the intake flux
@@ -34,7 +34,7 @@ We the the $NaK$-ATPase
 \end{equation}
 with
 \begin{equation}
-	\rho_{NaK} = V_{NaK} \dfrac{\left[Na^+\right]}{K_{NaK}+\left[Na^+\right]}
+	\rho_{NaK} = V_{NaK} \dfrac{\left[1+\tanh\left(0.39\zeta+1.28\right)\right]}{2}\dfrac{\left[Na^+\right]}{K_{NaK}+\left[Na^+\right]}
 \end{equation}
 
 The charge conservation imposes the change in potential
@@ -186,39 +186,52 @@ such that
 \end{equation}
 
 
-\item Since we got an open system in lactic acid, we need a basal level of lactic acid (or lactate) concentration.
-Assuming that the production term $\Lambda_0$ is known as well, then we find the expression
-\begin{equation}
-	\Lambda_0 \sigma_{PFK}^\star = \Lambda^\star = \dfrac{S}{V}\left(\rho_{MCT_1} + \rho_{MCT_4}\right).
-\end{equation}
-We also need a parameter $\beta$ such that
-\begin{equation}
-	\left\lbrace
-	\begin{array}{rcr}
-	\dfrac{S}{V}\rho_{MCT_1} & = & \beta \Lambda^\star\\
-	\\
-	\dfrac{S}{V}\rho_{MCT_4} & = & (1-\beta) \Lambda^\star\\
-	\end{array}
-	\right.
-\end{equation}
-This parameter $\beta$ is the ratio of lactate elimination by $MCT_1$...
+\item
+% Since we got an open system in lactic acid, we need a basal level of lactic acid (or lactate) concentration.
+%Assuming that the production term $\Lambda_0$ is known as well, then we find the expression
+%\begin{equation}
+%	\Lambda_0 \sigma_{PFK}^\star = \Lambda^\star = \dfrac{S}{V}\left(\rho_{MCT_1} + \rho_{MCT_4}\right).
+%\end{equation}
+%We also need a parameter $\beta$ such that
+%\begin{equation}
+%	\left\lbrace
+%	\begin{array}{rcr}
+%	\dfrac{S}{V}\rho_{MCT_1} & = & \beta \Lambda^\star\\
+%	\\
+%	\dfrac{S}{V}\rho_{MCT_4} & = & (1-\beta) \Lambda^\star\\
+%	\end{array}
+%	\right.
+%\end{equation}
+%This parameter $\beta$ is the ratio of lactate elimination by $MCT_1$...
 
 Assuming that the $MCT$ are not too sensitive to pH within the physiological ranges, we may model their fluxes by
 \begin{equation}
 	\left\lbrace
-	\begin{array}{rcl}
-	\rho_{MCT_1} & = & V_{m_1} \dfrac{\left[Lac^-\right]}{K_{m_1}+\left[Lac^-\right]}\\
+	\begin{array}{rcll}
+	\rho_{MCT_1} & = & V_{m_1} \dfrac{\left[Lac^-\right]}{K_{m_1}+\left[Lac^-\right]}, & K_{m_1}\simeq 5mM\\
 	\\
-	\rho_{MCT_4} & = & V_{m_4} \dfrac{\left[Lac^-\right]}{K_{m_4}+\left[Lac^-\right]}\\
+	\rho_{MCT_4} & = & V_{m_4} \dfrac{\left[Lac^-\right]}{K_{m_4}+\left[Lac^-\right]}, & K_{m_4}\simeq 30mM\\
 	\end{array}
 	\right.
 \end{equation}
 (we may remove the proton dependency, implicit in the lactate concentration).
-Approximately, $MCT_1$ is able to expel the equivalent of $\sigma_{Lac}\approx 1mM/min$, so that, assuming the saturation
+Approximately, $MCT$s are able to expel at most the equivalent of $\sigma_{Lac}\approx 1mM/min$, so that, assuming the saturation
 \begin{equation}
-\sigma_{Lac} = \dfrac{S}{V} V_{m_1}
+\sigma_{Lac} = \dfrac{S}{V}\left( V_{m_1} + V_{m_4} \right)
 \end{equation}
-Let us now assume that $L^\star$ is the steady state concentration of lactates.
+We hence need a parameter $\beta$ such that
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcr}
+	V_{m_1} & = & \beta \dfrac{V}{S} \sigma_{Lac} \\
+	\\
+	V_{m_4} & = & (1-\beta) \dfrac{V}{S} \sigma_{Lac} \\
+	\end{array}
+	\right.
+\end{equation}
+
+
+%Let us now assume that $L^\star$ is the steady state concentration of lactates.
 \end{itemize}
 
 \subsection{System Reduction}

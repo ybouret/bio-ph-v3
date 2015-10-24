@@ -42,8 +42,8 @@ lib =
     {"CO3--",-2},
     -- {"HY",    0},
     -- {"Y-",   -1},
-    --{"LacH",  0},
-    --{"Lac-", -1},
+    {"LacH",  0},
+    {"Lac-", -1},
     {"OSM",   0}
 };
 
@@ -84,7 +84,7 @@ eqs =
     { "water", 1e-14, { 1, "H+"}, {  1, "HO-"} },
     { "bicarb", "kappa",          {  1, "H+" }, { 1, "HCO3-"} },
     { "carb",   K2,               {  1, "H+" }, { 1, "CO3--"}, { -1, "HCO3-" } },
-    -- { "lactic",10^(-pKLac),       { -1, "LacH"}, {1,"Lac-"},{1,"H+"} },
+    { "lactic",10^(-pKLac),       { -1, "LacH"}, {1,"Lac-"},{1,"H+"} },
     -- { "buffer", 10^(-pKY),        { -1, "HY" }, { 1, "Y-"   }, {1, "H+" } }
 };
 
@@ -96,8 +96,9 @@ eff =
     "NaK",
     "NHE",
     "AE2",
-    "NBC"
-    --, "MCT"
+    "NBC",
+    "MCT1",
+    "MCT4"
 };
 
 
@@ -114,7 +115,7 @@ ini =
     { 10e-3,     { 1, "Na+" } },
     { 20e-3,     { 1, "Cl-" } },
     { "osmolarity", 300e-3},
-    -- NoLactate,
+    NoLactate,
     --{ 60e-3, { 1, "HY"}, {1, "Y-" } },
 };
 
@@ -132,7 +133,7 @@ init0 =
     { 140e-3,       { 1, "Na+" } },
     { 100e-3,       { 1, "Cl-" } },
     { "osmolarity", 300e-3 },
-    --NoLactate,
+    NoLactate,
     --{ 0, { 1, "HY"}, {1, "Y-" } }
 }
 
@@ -143,7 +144,7 @@ init1 =
     { 140e-3,       { 1, "Na+" } },
     { 100e-3,       { 1, "Cl-" } },
     { "osmolarity",  300e-3 },
-    --NoLactate,
+    NoLactate,
     --{ 0, { 1, "HY"}, {1, "Y-" } }
 }
 
@@ -353,13 +354,25 @@ end
 -- -----------------------------------------------------------------------------
 -- MCT
 -- -----------------------------------------------------------------------------
-K_Lac = 30e-3;
+sigma_Lac = 1e-3/60.0; -- max expel rate
+beta      = 0.5;
+Vm1       = beta     * sigma_Lac * volume/surface;
+Vm4       = (1-beta) * sigma_Lac * volume/surface;
+Km1       = 5e-3;
+Km4       = 30e-3;
 
-function MCT(t,Cin,Cout,params)
+
+function MCT1(t,Cin,Cout,params)
 local Lac = Cin["Lac-"];
-
 a = {}
-a["Lac-"] = - Lac/(K_Lac+Lac);
+a["Lac-"] = - Vm1 * Lac/(Km1+Lac);
+return a;
+end
+
+function MCT4(t,Cin,Cout,params)
+local Lac = Cin["Lac-"];
+a = {}
+a["Lac-"] = - Vm4 * Lac/(Km4+Lac);
 return a;
 end
 
