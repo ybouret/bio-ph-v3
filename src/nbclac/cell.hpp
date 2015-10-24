@@ -29,6 +29,7 @@ public:
     const double  Vm4; //!< max speed for MCT4
 
     Lua::Function<double> Lambda;
+    Lua::Function<double> PFK;
 
     explicit Cell( lua_State *vm, const double t);
     virtual ~Cell() throw();
@@ -45,7 +46,7 @@ public:
     //! SetSteady state and all paces
     void Setup(double Em);
 
-    void Powers(double t, const array<double> &Y, double &p1, double &p4);
+    void Powers(double t, const array<double> &Y, double &p1, double &p4, double &pfk);
 
 
 private:

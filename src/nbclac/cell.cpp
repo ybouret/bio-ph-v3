@@ -25,7 +25,8 @@ MCT1( eff["MCT1"] ),
 MCT4( eff["MCT4"] ),
 Vm1( Lua::Config::Get<lua_Number>(vm, "Vm1" ) ),
 Vm4( Lua::Config::Get<lua_Number>(vm, "Vm4" ) ),
-Lambda(vm,"Lambda")
+Lambda(vm,"Lambda"),
+PFK(vm,"PFK")
 {
     //NBC.pace = 0.0;
 }
@@ -276,7 +277,7 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
 
 }
 
-void Cell:: Powers(double t, const array<double> &Y, double &p1, double &p4)
+void Cell:: Powers(double t, const array<double> &Y, double &p1, double &p4, double &pfk)
 {
     ComputeOutsideComposition(t);
     //const double S   = Y[iSurface] * 1e-12; //!< mu^2
@@ -290,7 +291,10 @@ void Cell:: Powers(double t, const array<double> &Y, double &p1, double &p4)
     tao::ld(rho,0);
     MCT4.rate(rho, t, Y, out, params);
     p4 = - rho[iLacH]/Vm4;
-    
+
+    const double h = Y[iH];
+    pfk = PFK( -Log10(h) );
+
 }
 
 

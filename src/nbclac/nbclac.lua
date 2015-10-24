@@ -388,4 +388,9 @@ return 10*sigma_Lac;
 end
 
 
+function PFK(pH)
+local tmp = (1.0+tanh(4.18*(pH-6.81)))/2;
+return tmp*tmp;
+end
+
 

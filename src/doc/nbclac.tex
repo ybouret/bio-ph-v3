@@ -98,8 +98,23 @@ The $CO_2$ transport is equivalent to an effective $CO_2$ partial pressure $\Pi_
 \subsubsection{Lactic acid}
 We assume that the lactic acid is produced with and internal rate
 \begin{equation}
-	\Lambda = \Lambda_0 \times \sigma_{PFK}\left(\dfrac{h}{K_{PFK}}\right)
+	\Lambda = \Lambda_0 \times \sigma_{PFK}\left(\mathrm{pH}\right)
 \end{equation}
+
+From another article, we may use
+\begin{equation}
+\sigma_{PFK}\left(\mathrm{pH}\right)  = \left(\dfrac{1+\tanh\left[ a \left(\mathrm{pH}-b\right)\right] }{2}\right)^2
+\end{equation}
+with
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcll}
+	a & = & 4.18 & \pm 0.04\\
+	b & = & 6.81 & \pm 0.003\\
+	\end{array}
+	\right.
+\end{equation}
+
 
 \section{Chemical Reactions}
 

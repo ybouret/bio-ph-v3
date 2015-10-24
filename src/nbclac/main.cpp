@@ -12,9 +12,9 @@ inline
 void save_powers( const string &filename, Cell &cell, double t, const array<double> &Y )
 {
     ios::acstream fp(filename);
-    double p1=0,p4=0;
-    cell.Powers(t, Y, p1, p4);
-    fp("%g %g %g\n", t, p1, p4);
+    double p1=0,p4=0,pfk=0;
+    cell.Powers(t, Y, p1, p4, pfk);
+    fp("%g %g %g %g\n", t, p1, p4, pfk);
 }
 
 YOCTO_PROGRAM_START()
@@ -109,7 +109,7 @@ YOCTO_PROGRAM_START()
     const string powerName = "power.dat";
     {
         ios::wcstream fp(powerName);
-        fp("#t MCT1 MCT4\n");
+        fp("#t MCT1 MCT4 PFK\n");
     }
 
     save_powers(powerName, cell, 0, Y);
