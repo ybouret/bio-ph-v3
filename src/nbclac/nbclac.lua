@@ -60,10 +60,10 @@ pKY = 6.2;
 
 function P_CO2(t)
 local  P0    = 40.0;
-local  W     = 300;
-if (t>=5) and (t<=W+5) then
-  return P0/760.0 + (8/760.0) * math.sin(math.pi*(t-5)/W)^2;
-end
+--local  W     = 300;
+--if (t>=5) and (t<=W+5) then
+--  return P0/760.0 + (8/760.0) * math.sin(math.pi*(t-5)/W)^2;
+--end
 return P0/760;
 end
 
@@ -354,28 +354,38 @@ end
 -- -----------------------------------------------------------------------------
 -- MCT
 -- -----------------------------------------------------------------------------
-sigma_Lac = 1e-3/60.0; -- max expel rate
+sigma_Lac    = 1e-3/60.0; -- max expel rate in mol/L/s
+sigma_Lac_SI = sigma_Lac * 1000.0; -- in mol/m^3/s
+
+v_over_s     = volume/surface;     -- in microns
+v_over_s_SI  = 1e-6 * v_over_s;    -- in meters
+
 beta      = 0.5;
-Vm1       = beta     * sigma_Lac * volume/surface;
-Vm4       = (1-beta) * sigma_Lac * volume/surface;
+Vm1       = beta     * sigma_Lac_SI * v_over_s_SI;
+Vm4       = (1-beta) * sigma_Lac_SI * v_over_s_SI;
 Km1       = 5e-3;
 Km4       = 30e-3;
 
 
+-- should be in mol/m^2/s
 function MCT1(t,Cin,Cout,params)
 local Lac = Cin["Lac-"];
 a = {}
-a["Lac-"] = - Vm1 * Lac/(Km1+Lac);
+a["LacH"] = - Vm1 * Lac/(Km1+Lac);
 return a;
 end
 
 function MCT4(t,Cin,Cout,params)
 local Lac = Cin["Lac-"];
 a = {}
-a["Lac-"] = - Vm4 * Lac/(Km4+Lac);
+a["LacH"] = - Vm4 * Lac/(Km4+Lac);
 return a;
 end
 
+-- in mol/L
+function Lambda(t)
+return 10*sigma_Lac;
+end
 
 
 

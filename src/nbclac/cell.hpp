@@ -2,6 +2,7 @@
 #define PLOS_CELL_INCLUDED 1
 
 #include "../h+core/hcell.hpp"
+#include "yocto/lua/lua-maths.hpp"
 
 class Cell : public HCell
 {
@@ -11,6 +12,7 @@ public:
     const size_t iCl;
     const size_t iH;
     const size_t iB;
+    const size_t iLacH;
     
     effector &leak_K;
     effector &leak_Na;
@@ -21,7 +23,13 @@ public:
     effector     &NaK;
     const double  alpha;    //!< NHE fraction in [0:1]
     effector     &NBC;
-    
+    effector     &MCT1;
+    effector     &MCT4;
+    const double  Vm1; //!< max speed for MCT1
+    const double  Vm4; //!< max speed for MCT4
+
+    Lua::Function<double> Lambda;
+
     explicit Cell( lua_State *vm, const double t);
     virtual ~Cell() throw();
 

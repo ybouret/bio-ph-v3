@@ -12,6 +12,7 @@ iK(  lib["K+"]->indx  ),
 iCl( lib["Cl-"]->indx ),
 iH(  lib["H+"]->indx  ),
 iB(  lib["HCO3-"]->indx ),
+iLacH( lib["LacH"]->indx ),
 leak_K(  eff["lambda_K"]  ),
 leak_Na( eff["lambda_Na"] ),
 leak_Cl( eff["lambda_Cl"] ),
@@ -19,9 +20,14 @@ NHE( eff["NHE"] ),
 AE2( eff["AE2"] ),
 NaK( eff["NaK"] ),
 alpha( clamp<double>(0,Lua::Config::Get<lua_Number>(vm,"alpha"),1) ),
-NBC( eff["NBC"] )
+NBC( eff["NBC"] ),
+MCT1( eff["MCT1"] ),
+MCT4( eff["MCT4"] ),
+Vm1( Lua::Config::Get<lua_Number>(vm, "Vm1" ) ),
+Vm4( Lua::Config::Get<lua_Number>(vm, "Vm4" ) ),
+Lambda(vm,"Lambda")
 {
-    NBC.pace = 0.0;
+    //NBC.pace = 0.0;
 }
 
 #include "yocto/math/fcn/zfind.hpp"
@@ -257,7 +263,10 @@ void Cell:: Rates( array<double> &dYdt, double t, const array<double> &Y )
     {
         dYdt[i] = rho[i]*J2C;
     }
-    
+
+    // Lactate
+    dYdt[iLacH] += Lambda(t);
+
     //__________________________________________________________________________
     //
     //chemical absorption + constants variation
