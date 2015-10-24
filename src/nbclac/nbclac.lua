@@ -384,7 +384,11 @@ end
 
 -- in mol/L
 function Lambda(t)
-return 10*sigma_Lac;
+local  W     = 30;
+if (t>=5) and (t<=W+5) then
+  return 10 * sigma_Lac* math.sin(math.pi*(t-5)/W)^2;
+end
+return 0;
 end
 
 
