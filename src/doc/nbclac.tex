@@ -8,42 +8,59 @@
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
 \begin{document}
-\title{NBC+Lactates}
+\title{Establishing a pH equation}
 \maketitle
 
-\section{Fluxes and metabolism}
-%$$ R \;\; \mathcal{R}\tan\alpha  \;\; \mathrm{div} \vec{v} $$
+\section{What do we need}
+We use the method described in [PLOS one...]. We first inventory the species which are required
+to design a minimal biochemical and physical subsystem that will allow us to carry out the computation
+of the global ionic steady state of a cell, including the membrane potential.
+Those species are naturally $H^+$, $HO^-$, $K^+$, $Na^+$, $Cl^-$, aqueous $CO_2$, $HCO_3^-$, $CO_3^{2-}$ and
+for this study the lactic acid $LacH$ and the lactacte ion $Lac^-$.
+In the following, we review the  matter fluxes through the cell membrane and the other
+chemical transformations that allows the build up of a globally self-consistent physical model.
+
+\section{Fluxes through the cell membrane}
+
 
 \subsection{Passive Fluxes}
-For each species $X$ that may flow through the membrane, we use the GHK flux equation and find the intake flux
+We assume that the internal potential of the cell is $E$, and we define :
+\begin{equation}
+	\zeta = \dfrac{FE}{RT}.
+\end{equation}
+
+For each species $X$ (with an algebraic charge $z_X$) which that may flow through the membrane, we use the Goldman-Hodgkin-Katz flux equation and find the intake flux :
 \begin{equation}
 	j_X =  P_X\left(\zeta\right) \Psi(z_X\zeta)
-	\left([X]_{out} - [X]e^{z_X\zeta}\right)
+	\left([X]_{out} - [X]e^{z_X\zeta}\right), \; \Psi(u) = \dfrac{u}{e^u-1}.
 \end{equation}
-then
+We then get their corresponding contribution to the change of concentration in a cell with a volume $V$ and
+a surface $S$ by:
 \begin{equation}
 	\partial_t [X]_{passive} = \dfrac{S}{V} j_X = \lambda_X.
 \end{equation}
-The permeabilities are provided by electrophysiological measurements.
+The permeabilities are provided by electrophysiological measurements (see PLOS).
+If the charge of $X$ is not zero, then a passive leak is electrogenic.
 
 \subsection{Electrogenic fluxes}
-We the the $NaK$-ATPase
+We use the most ubiquitous $NaK$-ATPase which transports the following ions as:
 \begin{equation}
 	\dfrac{1}{2} \partial_t \left[K^+\right]_{{NaK}} = -\dfrac{1}{3} \partial_t \left[ Na^+\right]_{{NaK}}
 	= \dfrac{S}{V}\rho_{NaK}
 \end{equation}
-with
+with a flux approximated by [PLOS]
 \begin{equation}
-	\rho_{NaK} = V_{NaK} \dfrac{\left[1+\tanh\left(0.39\zeta+1.28\right)\right]}{2}\dfrac{\left[Na^+\right]}{K_{NaK}+\left[Na^+\right]}
+	\rho_{NaK} = V_{NaK} \dfrac{\left[1+\tanh\left(0.39\zeta+1.28\right)\right]}{2}\dfrac{\left[Na^+\right]}{K_{NaK}+\left[Na^+\right]},\;K_{NaK}\simeq12mM.
 \end{equation}
 
 The charge conservation imposes the change in potential
 \begin{equation}
 	\partial_t\left( C E\right) + \sum_X z_X F \partial_t\left( V \times  (\left[X\right]_{out}-\left[X\right]) \right) = 0
 \end{equation}
-taking care of the units (here concentrations must be in $mol/m^3$.)
+We take care of the units in which this equation is valid (here concentrations must be in $mol/m^3$.)
 
 \subsection{Electroneutral Fluxes}
+The following transporters are present in the cell we described, and their kinetics are well described.
 \begin{itemize}
 	\item $NHE$, 
 	\begin{equation}
@@ -51,9 +68,17 @@ taking care of the units (here concentrations must be in $mol/m^3$.)
 	\end{equation}
 	with
 	\begin{equation}
-		\rho_{NHE} = V_{NHE}...
+		\rho_{NHE} = V_{NHE} \sigma_{NHE}\left(\dfrac{h}{K_r}\right), \; h=\left[H^+\right], \;K_r\approx1.8\cdot10^{-8}M
 	\end{equation}
-	
+	and
+	\begin{equation}
+		\sigma_{NHE}(x) = \dfrac{
+		x(1+x) + L_0 C x(1+Cx)
+		}
+		{
+		L_0 (1+Cx)^2 + (1+x)^2
+		}, \; K_t\approx 3.6\cdot10^{-6}M, \; C=K_r/K_t,\;L_0\approx10^3.
+	\end{equation}
 	\item $AE$,
 	\begin{equation}
 	\partial_t \left[Cl^-\right]_{AE} = -\partial_t \left[HCO_3^-\right]_{AE} = \dfrac{S}{V} \rho_{AE}
@@ -84,24 +109,27 @@ taking care of the units (here concentrations must be in $mol/m^3$.)
 	}, \;\; K_{Na} \simeq 30 mM, \; K_{BC} \simeq  4mM.
 	\end{equation}	
 		
-	\item Lactic acid, with $MCT_u$
+	\item Lactic acid (or lactate+proton) is expelled through Mono-Carboxylate Transporters (MCT),
+	mostly $MCT_1$ and $MCT_4$, so that
 	\begin{equation}
-	\partial_t \left[LacH\right] = \sum_u \dfrac{S}{V}\rho_{MCT_u}
+	\partial_t \left[LacH\right]_{MCT} = \sum_u \dfrac{S}{V}\rho_{MCT_u}.
 	\end{equation}
+	The kinetics expression of this term is expresses further, according to the hypotheses of our model.
+	
 \end{itemize}
 
 \subsection{Internal Production}
 
 \subsubsection{$CO_2$}
-The $CO_2$ transport is equivalent to an effective $CO_2$ partial pressure $\Pi_{CO_2}$.
+The aqueous $CO_2$ presence is equivalent to an effective $CO_2$ partial pressure $\Pi_{CO_2}\approx 40mmHg$,
+arising from the normal metabolism.
 
 \subsubsection{Lactic acid}
-We assume that the lactic acid is produced with and internal rate
-\begin{equation}
-	\Lambda = \Lambda_0 \times \sigma_{PFK}\left(\mathrm{pH}\right)
-\end{equation}
+We assume that the lactic acid is produced with and internal rate $\Lambda$, which may be
+intrinsic or simulated to see how the cell reacts to different lactic concentrations.
 
-From another article, we may use
+From another article [Bock and Frieden], we may monitor the activity of PFK since it has
+been shown that in our case it may be described by:
 \begin{equation}
 \sigma_{PFK}\left(\mathrm{pH}\right)  = \left(\dfrac{1+\tanh\left[ a \left(\mathrm{pH}-b\right)\right] }{2}\right)^2
 \end{equation}
@@ -116,28 +144,42 @@ with
 \end{equation}
 
 
-\section{Chemical Reactions}
-
-\subsection{Water}
+\section{Chemical Equilibria}
+The following equilibria are to be accounted for. Each of them possess a molar rate that we will use
+in the next paragraph.
+\begin{itemize}
+\item{Water}
 \begin{equation}
 	H_2O \rightleftharpoons H^+ + HO^-, \; K_w = 10^{-14} = \left[H^+\right]\left[HO^-\right]
 \end{equation}	
+with a molar rate $\chi_w$.
 
-\subsection{Carbonic system}
+\item{Carbonic system}
 \begin{equation}
 	CO_2 \rightleftharpoons H^+ + HCO_3^-, \; K_1' = \dfrac{K_1}{K_H} = \dfrac{\left[H^+\right]\left[HCO_3^-\right]}{\Pi_{CO_2}}
+	, \; K_1=4.45\cdot10^{-7},\;K_H=29.41 atm/M.
 \end{equation}
+with a molar rate $\chi_1'$ and
+
 \begin{equation}
 	HCO_3^- \rightleftharpoons H^+ + CO_3^{2-}, \; K_2  = \dfrac{\left[H^+\right]\left[CO_3^{2-}\right]}{\left[HCO_3^-\right]}
+	,\;K_2 = 5.6\cdot10^{-11}.
 \end{equation}
-\subsection{Lactic Acid}
-\begin{equation}
-	LacH \rightleftharpoons H^+ + Lac^-, \; K_{Lac} = \dfrac{\left[H^+\right]\left[Lac^-\right]}{\left[LacH\right]}
-\end{equation}
+with a molar rate $\chi_2$.
 
-\section{ODE}
+\item{Lactic Acid}
+\begin{equation}
+	LacH \rightleftharpoons H^+ + Lac^-, \; K_{Lac} = \dfrac{\left[H^+\right]\left[Lac^-\right]}{\left[LacH\right]},
+	\;K_{Lac} = 10^{-3.86}.
+\end{equation}
+with a molar rate $\chi_{Lac}$.
+\end{itemize}
+
+
+\section{Differential system}
 \subsection{Matter transformation}
-Using $Na^+,K^+$ and $Cl^-$ leaks, and we take into account the molar rate of each reaction.	
+Using only $Na^+,K^+$ and $Cl^-$ leaks, the net molar rate for each species is
+listed below.	
 \begin{equation}
 \left\lbrace
 \begin{array}{rcl}
@@ -165,7 +207,7 @@ Using $Na^+,K^+$ and $Cl^-$ leaks, and we take into account the molar rate of ea
 \right.
 \end{equation}
 
-\subsection{Steady State}
+\subsection{Finding out the Steady State}
 \begin{itemize}
 \item We assume that $h^\star$ is known.
 \item
@@ -200,26 +242,36 @@ such that
 	\right.
 \end{equation}
 
+\item The lactic species concentration will be determined by the struggle between the production
+by $\Lambda$ and the elimination by the MCTs. At first, we may consider that we start with no lactic species.
 
-\item
-% Since we got an open system in lactic acid, we need a basal level of lactic acid (or lactate) concentration.
-%Assuming that the production term $\Lambda_0$ is known as well, then we find the expression
-%\begin{equation}
-%	\Lambda_0 \sigma_{PFK}^\star = \Lambda^\star = \dfrac{S}{V}\left(\rho_{MCT_1} + \rho_{MCT_4}\right).
-%\end{equation}
-%We also need a parameter $\beta$ such that
-%\begin{equation}
-%	\left\lbrace
-%	\begin{array}{rcr}
-%	\dfrac{S}{V}\rho_{MCT_1} & = & \beta \Lambda^\star\\
-%	\\
-%	\dfrac{S}{V}\rho_{MCT_4} & = & (1-\beta) \Lambda^\star\\
-%	\end{array}
-%	\right.
-%\end{equation}
-%This parameter $\beta$ is the ratio of lactate elimination by $MCT_1$...
 
-Assuming that the $MCT$ are not too sensitive to pH within the physiological ranges, we may model their fluxes by
+\end{itemize}
+
+And we can add some other equation (like buffering by another weak acid) at will.
+
+\subsection{Findind the chemical rates}
+Besides water, it is almost impossible to find a complete kinetic description of all the protic equilibria, since
+the proton is involved in a combinatoric number of transformation. Nonetheless, the protic
+reactions in water have a very short relaxation time, around a few microseconds, which is very small compared to
+the biochemical times we are exploring (way greater than one second).\\
+The main idea we previously developped [PLOS] was the following: using a vector of concentration $\vec{X}$, let us assume that we
+have a vector $\vec{\Gamma}\left(\vec{X}\right)$ (with a size equal to the number of equilibria) which is nul when all equilibria are met. We now make a 'slow' perturbation $\partial_t \vec{X}_{slow}$ during $dt$, and we look for the chemical extent $d\vec{\xi}$
+produced by the equilibria such that
+\begin{equation}
+		\vec{\Gamma}\left(\vec{X}+dt\partial_t\vec{X}_{slow} + \boldsymbol{\nu}^T d\vec{\xi}\right) = \vec{0}
+\end{equation}
+where $\boldsymbol{\nu}$ is the topological matrix of the equilibria.
+We do not need any more to compute the molar rate, since we obtain a new set of equations:
+\begin{equation}
+	\partial_t\vec{X} = \partial_t\vec{X}_{slow} - \boldsymbol{\nu}^T\left(\boldsymbol{\Phi}\boldsymbol{\nu}^T\right)^{-1}
+	\boldsymbol{\Phi} \partial_t\vec{X}_{slow}
+\end{equation}
+where $\boldsymbol{\Phi}$ is the Jacobian matrix of $\vec{\Gamma}$.\\
+The 'response' matrix has no simple expression, but can be numerically efficiently computed for any simulation.
+
+\subsection{Rates for MCT}
+Since in our model all the protic concentrations are dependent, we may model the MCTs fluxes by
 \begin{equation}
 	\left\lbrace
 	\begin{array}{rcll}
@@ -229,7 +281,6 @@ Assuming that the $MCT$ are not too sensitive to pH within the physiological ran
 	\end{array}
 	\right.
 \end{equation}
-(we may remove the proton dependency, implicit in the lactate concentration).
 Approximately, $MCT$s are able to expel at most the equivalent of $\sigma_{Lac}\approx 1mM/min$, so that, assuming the saturation
 \begin{equation}
 \sigma_{Lac} = \dfrac{S}{V}\left( V_{m_1} + V_{m_4} \right)
@@ -244,39 +295,35 @@ We hence need a parameter $\beta$ such that
 	\end{array}
 	\right.
 \end{equation}
+and we plug those expressions in our model.
 
-
-%Let us now assume that $L^\star$ is the steady state concentration of lactates.
-\end{itemize}
-
-\subsection{System Reduction}
-We use the protic vector of 6 variables
+\subsection{Example of system reduction}
+For the sake of simplicity, we get rid of the dissociation of bicarbonate.
+We hence use the protic vector of 5 variables
 \begin{equation}
-	\vec{X} = \left( \left[H^+\right]  \left[HO^-\right] \left[HCO_3^-\right] \left[CO_3^{2-}\right] \left[LacH\right]  \left[Lac^-\right] \right)^T
+	\vec{X} = \left( \left[H^+\right]  \left[HO^-\right] \left[HCO_3^-\right] \left[LacH\right]  \left[Lac^-\right] \right)^T
 \end{equation}
-undergoing 4 reactions.
-The topological matrix is
-\begin{equation}
-	\boldsymbol{\nu} =
-	\begin{pmatrix}
-	1 & 1 & 0 & 0 & 0 & 0\\
-	1 & 0 & 1 & 0 & 0 & 0\\
-	1 & 0 & -1 & 1 & 0 & 0\\
-	1 & 0 & 0 & 0  & -1 & 1\\
-	\end{pmatrix}
-\end{equation}
-The equilibrium vector is
+undergoing 3 reactions, leading to an equilibrium vector
 \begin{equation}
 	\vec{\Gamma} =
 	 \begin{pmatrix}
 	K_w - \left[H^+\right]  \left[HO^-\right]\\
-	K_1'\Pi_{CO_2} - \left[H^+\right]\left[HCO_3^-\right]\\
-	K_2 {\left[HCO_3^-\right]} -\left[H^+\right]\left[CO_3^{2-}\right]\\
+	 \kappa - \left[H^+\right]\left[HCO_3^-\right]\\
 	K_{Lac}\left[LacH\right] - \left[H^+\right]\left[Lac^-\right]
-	\end{pmatrix}
+	\end{pmatrix}, \;\kappa=K_1'\Pi_{CO_2}
+\end{equation}
+which is free of singularity.\\
+The topological matrix is a $5\times3$ matrix
+\begin{equation}
+	\boldsymbol{\nu} =
+	\begin{pmatrix}
+	1 & 1 & 0 &  0 & 0\\
+	1 & 0 & 1 &  0 & 0\\
+	1 & 0 & 0 &  -1 & 1\\
+	\end{pmatrix}.
 \end{equation}
 
-Neglecting the dissociation of $HCO_3^-$, we get the already complicated expression, using $\kappa = K_1'\Pi_{CO_2}$:
+In that simple case, the algebraic computation provides the following expression for $\left[H^+\right]$.
 \begin{equation}
 \partial_t h = - \dfrac{S}{V} h^2
 \dfrac{\left(h+K_{Lac}\right)\left(\rho_{NHE}+\rho_{NBC}-\rho_{AE}\right)+K_{Lac}\left(\sum \rho_{MCT}-V\Lambda/S\right)}
