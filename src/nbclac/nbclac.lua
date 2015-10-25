@@ -384,10 +384,22 @@ end
 
 -- in mol/L
 function Lambda(t)
-local  W     = 30;
-if (t>=5) and (t<=W+5) then
-  return 10 * sigma_Lac* math.sin(math.pi*(t-5)/W)^2;
+local  rise  = 30;
+local  down  = 30;
+local  tIni  = 5;
+local  tMax  = tIni + rise;
+local  tEnd  = tMax + down;
+local  pulse = 10*sigma_Lac;
+
+if (t>=tIni) and (t<=tMax) then
+  --return 10 * sigma_Lac* math.sin(math.pi*(t-5)/W)^2;
+return pulse * (t-tIni)/rise;
 end
+
+if(t>tMax) and (t<=tEnd) then
+return pulse * (1-(t-tMax)/down);
+end
+
 return 0;
 end
 

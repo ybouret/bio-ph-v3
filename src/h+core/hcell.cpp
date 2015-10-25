@@ -207,16 +207,19 @@ void HCell:: ComputeOutsideComposition(const double t)
 ////////////////////////////////////////////////////////////////////////////////
 ios::ostream & HCell:: add_header( ios::ostream &fp ) const
 {
-    fp << " pH";
-    fp << " Em";
-    fp << " volume";
-    fp << " surface";
-    fp << " deltaOsm";
+    size_t iCol = 1; // time column
+    fp << " pH"; ++iCol;
+    fp << " Em"; ++iCol;
+    fp << " volume"; ++iCol;
+    fp << " surface"; ++iCol;
+    fp << " deltaOsm"; ++iCol;
 
     for(library::const_iterator i = lib.begin(); i != lib.end(); ++i)
     {
         const string &id = (*i)->name;
         fp << ' ' << id;
+        ++iCol;
+        std::cerr << "\t\t[" << id << "]@column " << iCol << std::endl;
     }
     return fp;
 }
