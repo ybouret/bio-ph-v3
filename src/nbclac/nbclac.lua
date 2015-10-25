@@ -389,8 +389,8 @@ local  down  = 30;
 local  tIni  = 5;
 local  tMax  = tIni + rise;
 local  tEnd  = tMax + down;
--- 2.1 => 1mM max in lactate, 10.35 => 5mM
-local  pulse = 10.35*sigma_Lac;
+-- 2.1 => 1mM max in lactate, 10.35 => 5mM, 20.6 => 10 mM
+local  pulse = 20.6*sigma_Lac;
 
 if (t>=tIni) and (t<=tMax) then
   --return 10 * sigma_Lac* math.sin(math.pi*(t-5)/W)^2;
@@ -409,5 +409,9 @@ function PFK(pH)
 local tmp = (1.0+tanh(4.18*(pH-6.81)))/2;
 return tmp*tmp;
 end
+
+--function Lambda(t)
+--return 0.1*sigma_Lac * (1-exp(-t/1.0));
+--end
 
 
