@@ -8,7 +8,7 @@ diff_h = 1e-4; -- initial adaptive time step between to time steps
 
 dt      = 0.2;
 dt_save = 1;
-t_run   = 1500;
+t_run   = 3600;
 
 T       = 298;
 
@@ -389,7 +389,8 @@ local  down  = 30;
 local  tIni  = 5;
 local  tMax  = tIni + rise;
 local  tEnd  = tMax + down;
-local  pulse = 10*sigma_Lac;
+-- 2.1 => 1mM max in lactate, 10.35 => 5mM
+local  pulse = 10.35*sigma_Lac;
 
 if (t>=tIni) and (t<=tMax) then
   --return 10 * sigma_Lac* math.sin(math.pi*(t-5)/W)^2;

@@ -14,7 +14,7 @@ void save_powers( const string &filename, Cell &cell, double t, const array<doub
     ios::acstream fp(filename);
     double p1=0,p4=0,pfk=0;
     cell.Powers(t, Y, p1, p4, pfk);
-    fp("%g %g %g %g\n", t, p1, p4, pfk);
+    fp("%g %g %g %g\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
 }
 
 YOCTO_PROGRAM_START()
