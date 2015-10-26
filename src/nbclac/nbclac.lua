@@ -329,7 +329,7 @@ end
 -- NBC
 -- -----------------------------------------------------------------------------
 
-alpha = 0.9;  -- composition in NBC
+alpha = 0.9;  -- composition in NHE
 
 K_NBC_na = 30e-3; -- NBC Na affinity
 K_NBC_b  =  4e-3; -- NBC bicarb affinity
