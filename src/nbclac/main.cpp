@@ -17,6 +17,16 @@ void save_powers( const string &filename, Cell &cell, double t, const array<doub
     fp("%g %g %g %g\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
 }
 
+inline
+void save_powers_csv( const string &filename, Cell &cell, double t, const array<double> &Y )
+{
+    ios::acstream fp(filename);
+    double p1=0,p4=0,pfk=0;
+    cell.Powers(t, Y, p1, p4, pfk);
+    fp("%lf,%lf,%lf,%lf\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
+}
+
+
 YOCTO_PROGRAM_START()
 {
     //--------------------------------------------------------------------------
@@ -53,7 +63,7 @@ YOCTO_PROGRAM_START()
     const double Em0 = Lua::Config::Get<lua_Number>(L,"Em0");
     cell.Setup(Em0);
 
-    
+
 
     //--------------------------------------------------------------------------
     //
@@ -88,6 +98,7 @@ YOCTO_PROGRAM_START()
     std::cerr << "t_run=" << t_run << std::endl;
     std::cerr << "niter=" << niter << std::endl;
 
+    const string tag = Lua::Config::Get<string>(L,"tag");
 
     //--------------------------------------------------------------------------
     //
@@ -96,8 +107,13 @@ YOCTO_PROGRAM_START()
     //--------------------------------------------------------------------------
     static const char wheel[] = "|/-\\";
     size_t            iw      = 0;
+
+    const string outputDAT = "output" + tag + ".dat";
+    const string outputCSV = "output" + tag + ".csv";
+    const string powersDAT = "powers" + tag + ".dat";
+    const string powersCSV = "powers" + tag + ".csv";
     {
-        ios::ocstream fp("output.dat",false);
+        ios::wcstream fp(outputDAT);
         fp("#t ");
         cell.add_header(fp);
         fp("\n");
@@ -106,13 +122,30 @@ YOCTO_PROGRAM_START()
         fp("\n");
     }
 
-    const string powerName = "power.dat";
     {
-        ios::wcstream fp(powerName);
+        ios::wcstream fp(outputCSV);
+        fp("\"t\"");
+        cell.add_header_csv(fp);
+        fp("\n");
+        fp("0");
+        cell.add_values_csv(fp, Y);
+        fp("\n");
+    }
+
+
+    {
+        ios::wcstream fp(powersDAT);
         fp("#t MCT1 MCT4 PFK\n");
     }
 
-    save_powers(powerName, cell, 0, Y);
+    {
+        ios::wcstream fp(powersCSV);
+        fp("\"t\",\"MCT1\",\"MCT4\",\"PFK\"\n");
+    }
+
+    save_powers(powersDAT, cell, 0, Y);
+    save_powers_csv(powersCSV,cell,0,Y);
+
     for(size_t i=1;i<=niter;++i)
     {
         const double t0 = (i-1)*dt;
@@ -122,18 +155,30 @@ YOCTO_PROGRAM_START()
         if(0==(i%every))
         {
             std::cerr << '[' << wheel[ iw++ % (sizeof(wheel)-1) ] << ']' << "\tt=" << t << "         " << '\r';
-            ios::ocstream fp("output.dat",true);
-            fp("%g",t);
-            cell.add_values(fp,Y);
-            fp("\n");
-            save_powers(powerName, cell, t, Y);
+
+            {
+                ios::acstream fp(outputDAT);
+                fp("%g",t);
+                cell.add_values(fp,Y);
+                fp("\n");
+            }
+
+            {
+                ios::acstream fp(outputCSV);
+                fp("%g",t);
+                cell.add_values_csv(fp,Y);
+                fp("\n");
+            }
+
+            save_powers(powersDAT, cell, t, Y);
+            save_powers_csv(powersCSV, cell, t, Y);
         }
 
     }
     std::cerr << std::endl;
-
+    
     std::cerr << "#calls=" << cell.ncalls << std::endl;
-
+    
     return 0;
 }
 YOCTO_PROGRAM_END()

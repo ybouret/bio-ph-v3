@@ -329,7 +329,7 @@ end
 -- NBC
 -- -----------------------------------------------------------------------------
 
-alpha = 0.9;  -- composition in NHE
+alpha = 0.7;  -- composition in NHE
 
 K_NBC_na = 30e-3; -- NBC Na affinity
 K_NBC_b  =  4e-3; -- NBC bicarb affinity
@@ -382,6 +382,8 @@ a["LacH"] = - Vm4 * Lac/(Km4+Lac);
 return a;
 end
 
+tag="1mM";
+
 -- in mol/L
 function Lambda(t)
 local  rise  = 30;
@@ -390,7 +392,7 @@ local  tIni  = 5;
 local  tMax  = tIni + rise;
 local  tEnd  = tMax + down;
 -- 2.1 => 1mM max in lactate, 10.35 => 5mM, 20.6 => 10 mM
-local  pulse = 20.6*sigma_Lac;
+local  pulse = 2.1*sigma_Lac;
 
 if (t>=tIni) and (t<=tMax) then
   --return 10 * sigma_Lac* math.sin(math.pi*(t-5)/W)^2;

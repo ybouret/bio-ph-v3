@@ -3,13 +3,15 @@ CREATE := ./create.sh
 all:
 
 clean:
-	@echo "-- removing temporary files" && rm -f *.bin *.dat *.vtk
+	@echo "-- removing temporary files" && rm -f *.bin *.dat *.vtk *.csv
 	@echo "-- removing junk..." && find . -name '*~' | xargs rm -f
 
 
 veryclean: clean
 	@echo "-- removing out of sources builds" && cd forge && touch targets && ( cat targets | xargs rm -rf ) && rm -f targets
 	@echo "-- removing local binaries" && rm -Rf ./bin
+opt:
+	@bash ./build.sh clang Release
 
 gnu:
 	@bash $(CREATE) src gnu ${BUILD_TYPE}

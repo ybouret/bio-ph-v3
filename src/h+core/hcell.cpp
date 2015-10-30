@@ -224,6 +224,25 @@ ios::ostream & HCell:: add_header( ios::ostream &fp ) const
     return fp;
 }
 
+ios::ostream & HCell:: add_header_csv( ios::ostream &fp ) const
+{
+    size_t iCol = 1; // time column
+    fp << ",\"pH\""; ++iCol;
+    fp << ",\"Em\""; ++iCol;
+    fp << ",\"volume\""; ++iCol;
+    fp << ",\"surface\""; ++iCol;
+    fp << ",\"deltaOsm\""; ++iCol;
+
+    for(library::const_iterator i = lib.begin(); i != lib.end(); ++i)
+    {
+        const string &id = (*i)->name;
+        fp << ',' << '"' << id << '"';
+        ++iCol;
+        std::cerr << "\t\t[" << id << "]@column " << iCol << std::endl;
+    }
+    return fp;
+}
+
 ios::ostream & HCell:: add_values( ios::ostream &fp, const array<double> &Y ) const
 {
     assert(Y.size()>=nvar);
@@ -238,6 +257,22 @@ ios::ostream & HCell:: add_values( ios::ostream &fp, const array<double> &Y ) co
     }
     return fp;
 }
+
+ios::ostream & HCell:: add_values_csv( ios::ostream &fp, const array<double> &Y ) const
+{
+    assert(Y.size()>=nvar);
+    fp(",%.15g",lib.pH(Y));
+    fp(",%.15g",Y[iZeta]*Z2E*1000.0);
+    fp(",%.15g",Y[iVolume]);
+    fp(",%.15g",Y[iSurface]);
+    fp(",%.15g",lib.osmolarity(Y)-lib.osmolarity(out));
+    for(size_t i=1;i<=M;++i)
+    {
+        fp(",%.15g", Y[i]);
+    }
+    return fp;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

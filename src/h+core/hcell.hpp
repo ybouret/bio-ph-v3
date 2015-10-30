@@ -133,6 +133,10 @@ public:
     ios::ostream & add_header( ios::ostream &fp ) const;
     ios::ostream & add_values( ios::ostream &fp, const array<double> &Y ) const;
 
+    ios::ostream & add_header_csv( ios::ostream &fp ) const;
+    ios::ostream & add_values_csv( ios::ostream &fp, const array<double> &Y ) const;
+
+
 private:
     YOCTO_DISABLE_COPY_AND_ASSIGN(HCell);
     const array<string> & fill_params_reg(const char  *extra_params_reg[],
