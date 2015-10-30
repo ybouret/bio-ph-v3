@@ -142,7 +142,18 @@ with
 	\end{array}
 	\right.
 \end{equation}
-
+or the Hill representation
+\begin{equation}
+	\sigma_{PFK}\left(h\right) = \dfrac{K^c}{h^c+K^c}
+\end{equation}
+\begin{equation}
+	\left\lbrace
+	\begin{array}{rcll}
+	c & = & 4.32 & \pm 0.07\\
+	K & = & 1.19\cdot10^{-7} & \pm 5\cdot10^{-10}\\
+	\end{array}
+	\right.
+\end{equation}
 
 \section{Chemical Equilibria}
 The following equilibria are to be accounted for. Each of them possess a molar rate that we will use
@@ -275,9 +286,9 @@ Since in our model all the protic concentrations are dependent, we may model the
 \begin{equation}
 	\left\lbrace
 	\begin{array}{rcll}
-	\rho_{MCT_1} & = & V_{m_1} \dfrac{\left[Lac^-\right]}{K_{m_1}+\left[Lac^-\right]}, & K_{m_1}\simeq 5mM\\
+	\rho_{MCT_1} & = & V_{m_1} \dfrac{\left[Lac^-\right]}{K_{m_1}+\left[Lac^-\right]}, & K_{m_1}\simeq 4.8mM\\
 	\\
-	\rho_{MCT_4} & = & V_{m_4} \dfrac{\left[Lac^-\right]}{K_{m_4}+\left[Lac^-\right]}, & K_{m_4}\simeq 30mM\\
+	\rho_{MCT_4} & = & V_{m_4} \dfrac{\left[Lac^-\right]}{K_{m_4}+\left[Lac^-\right]}, & K_{m_4}\simeq 31.1mM\\
 	\end{array}
 	\right.
 \end{equation}
@@ -295,7 +306,9 @@ We hence need a parameter $\beta$ such that
 	\end{array}
 	\right.
 \end{equation}
-and we plug those expressions in our model.
+and we plug those expressions in our model: $\beta\approx0.25$ which represents the ratio of the catalytic turnover, when
+the MCT are at their maximum, saturated speed !
+
 
 \subsection{Example of system reduction}
 For the sake of simplicity, we get rid of the dissociation of bicarbonate.

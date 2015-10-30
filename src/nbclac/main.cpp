@@ -7,6 +7,7 @@
 #include "yocto/math/round.hpp"
 #include "yocto/program.hpp"
 
+static const double MCT_Factor = 60e6;
 
 inline
 void save_powers( const string &filename, Cell &cell, double t, const array<double> &Y )
@@ -14,7 +15,8 @@ void save_powers( const string &filename, Cell &cell, double t, const array<doub
     ios::acstream fp(filename);
     double p1=0,p4=0,pfk=0;
     cell.Powers(t, Y, p1, p4, pfk);
-    fp("%g %g %g %g\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
+    //fp("%g %g %g %g\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
+    fp("%g %g %g %g\n", t, MCT_Factor * p1, MCT_Factor * p4, 100.0*pfk);
 }
 
 inline
@@ -23,7 +25,9 @@ void save_powers_csv( const string &filename, Cell &cell, double t, const array<
     ios::acstream fp(filename);
     double p1=0,p4=0,pfk=0;
     cell.Powers(t, Y, p1, p4, pfk);
-    fp("%lf,%lf,%lf,%lf\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
+    //fp("%lf,%lf,%lf,%lf\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
+    fp("%lf,%lf,%lf,%lf\n", t, MCT_Factor*p1, MCT_Factor*p4, 100.0*pfk);
+
 }
 
 

@@ -329,7 +329,7 @@ end
 -- NBC
 -- -----------------------------------------------------------------------------
 
-alpha = 0.7;  -- composition in NHE
+alpha = 0.5;  -- composition in NHE
 
 K_NBC_na = 30e-3; -- NBC Na affinity
 K_NBC_b  =  4e-3; -- NBC bicarb affinity
@@ -360,11 +360,11 @@ sigma_Lac_SI = sigma_Lac * 1000.0; -- in mol/m^3/s
 v_over_s     = volume/surface;     -- in microns
 v_over_s_SI  = 1e-6 * v_over_s;    -- in meters
 
-beta      = 0.5;
+beta      = 0.25;
 Vm1       = beta     * sigma_Lac_SI * v_over_s_SI;
 Vm4       = (1-beta) * sigma_Lac_SI * v_over_s_SI;
-Km1       = 5e-3;
-Km4       = 30e-3;
+Km1       = 4.8e-3;
+Km4       = 31.1e-3;
 
 
 -- should be in mol/m^2/s
@@ -382,13 +382,13 @@ a["LacH"] = - Vm4 * Lac/(Km4+Lac);
 return a;
 end
 
-tag="1mM";
+tag="BBA";
 
--- in mol/L
+-- PULSE in mol/L
 function Lambda(t)
 local  rise  = 30;
 local  down  = 30;
-local  tIni  = 5;
+local  tIni  = 4;
 local  tMax  = tIni + rise;
 local  tEnd  = tMax + down;
 -- 2.1 => 1mM max in lactate, 10.35 => 5mM, 20.6 => 10 mM
@@ -404,6 +404,36 @@ return pulse * (1-(t-tMax)/down);
 end
 
 return 0;
+end
+
+
+-- CONSTANT in mol/L
+dt_save = 2;
+t_run   = 4*60 * 60;
+
+function Lambda(t)
+local  rise  = 30;
+local  down  = 30;
+local  tIni  = 4;
+local  tMax  = tIni + rise;
+local  tEnd  = tMax + down;
+local  pulse_max = 20.38*sigma_Lac;
+local  pulse     = 0.07*sigma_Lac;
+
+if (t>=tIni) and (t<=tMax) then
+return pulse_max * (t-tIni)/rise;
+end
+
+if(t>tMax) and (t<=tEnd) then
+return pulse_max + (pulse-pulse_max)*(t-tMax)/down;
+end
+
+if(t>tEnd) then
+return pulse;
+end
+
+return 0;
+
 end
 
 

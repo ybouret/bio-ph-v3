@@ -286,12 +286,31 @@ void Cell:: Powers(double t, const array<double> &Y, double &p1, double &p4, dou
     
     tao::ld(rho,0);
     MCT1.rate(rho, t, Y, out, params);
-    p1 = - rho[iLacH]/Vm1;
+    const double v1 = -rho[iLacH];
+    //p1 = - rho[iLacH]/Vm1;
 
     tao::ld(rho,0);
     MCT4.rate(rho, t, Y, out, params);
-    p4 = - rho[iLacH]/Vm4;
+    const double v4   = -rho[iLacH];
 
+    p1 = v1;
+    p4 = v4;
+
+#if 0
+    const double vtot = v1+v4;
+
+    if(vtot>0)
+    {
+        p1 = v1/vtot;
+        p4 = v4/vtot;
+    }
+    else
+    {
+        p1 = p4 = 0.5;
+    }
+
+    //p4 = - rho[iLacH]/Vm4;
+#endif
     const double h = Y[iH];
     pfk = PFK( -Log10(h) );
 
