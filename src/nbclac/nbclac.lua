@@ -6,8 +6,8 @@
 ftol   = 1e-5; -- differential fractional tolerance
 diff_h = 1e-4; -- initial adaptive time step between to time steps
 
-dt      = 0.2;
-dt_save = 1;
+dt      = 0.1; -- modified later
+dt_save = 2;   -- modified later
 t_run   = 3600;
 
 T       = 298;
@@ -382,7 +382,7 @@ a["LacH"] = - Vm4 * Lac/(Km4+Lac);
 return a;
 end
 
-tag="BBA";
+tag="BBA2";
 
 -- PULSE in mol/L
 function Lambda(t)
@@ -408,8 +408,8 @@ end
 
 
 -- CONSTANT in mol/L
-dt_save = 2;
-t_run   = 4*60 * 60;
+dt_save = 0.6;
+t_run   = 6*60 * 60;
 
 function Lambda(t)
 local  rise  = 30;
@@ -417,8 +417,9 @@ local  down  = 30;
 local  tIni  = 4;
 local  tMax  = tIni + rise;
 local  tEnd  = tMax + down;
-local  pulse_max = 20.38*sigma_Lac;
-local  pulse     = 0.07*sigma_Lac;
+-- 10mM -> 1mM : 20.38, 0.07
+local  pulse_max = 101*sigma_Lac;
+local  pulse     = 0.24*sigma_Lac;
 
 if (t>=tIni) and (t<=tMax) then
 return pulse_max * (t-tIni)/rise;

@@ -9,6 +9,8 @@
 
 static const double MCT_Factor = 60e6;
 
+#define TIME_SCALE 60.0
+
 inline
 void save_powers( const string &filename, Cell &cell, double t, const array<double> &Y )
 {
@@ -16,7 +18,7 @@ void save_powers( const string &filename, Cell &cell, double t, const array<doub
     double p1=0,p4=0,pfk=0;
     cell.Powers(t, Y, p1, p4, pfk);
     //fp("%g %g %g %g\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
-    fp("%g %g %g %g\n", t, MCT_Factor * p1, MCT_Factor * p4, 100.0*pfk);
+    fp("%g %g %g %g\n", t/TIME_SCALE, MCT_Factor * p1, MCT_Factor * p4, 100.0*pfk);
 }
 
 inline
@@ -26,7 +28,7 @@ void save_powers_csv( const string &filename, Cell &cell, double t, const array<
     double p1=0,p4=0,pfk=0;
     cell.Powers(t, Y, p1, p4, pfk);
     //fp("%lf,%lf,%lf,%lf\n", t, 100.0*p1, 100.0*p4, 100.0*pfk);
-    fp("%lf,%lf,%lf,%lf\n", t, MCT_Factor*p1, MCT_Factor*p4, 100.0*pfk);
+    fp("%lf,%lf,%lf,%lf\n", t/TIME_SCALE, MCT_Factor*p1, MCT_Factor*p4, 100.0*pfk);
 
 }
 
@@ -162,14 +164,14 @@ YOCTO_PROGRAM_START()
 
             {
                 ios::acstream fp(outputDAT);
-                fp("%g",t);
+                fp("%g",t/TIME_SCALE);
                 cell.add_values(fp,Y);
                 fp("\n");
             }
 
             {
                 ios::acstream fp(outputCSV);
-                fp("%g",t);
+                fp("%g",t/TIME_SCALE);
                 cell.add_values_csv(fp,Y);
                 fp("\n");
             }

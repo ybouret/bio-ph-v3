@@ -10,6 +10,7 @@ clean:
 veryclean: clean
 	@echo "-- removing out of sources builds" && cd forge && touch targets && ( cat targets | xargs rm -rf ) && rm -f targets
 	@echo "-- removing local binaries" && rm -Rf ./bin
+
 opt:
 	@bash ./build.sh clang Release
 
